@@ -1,0 +1,201 @@
+
+    <html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title id="titre">TIME</title>
+        <script src="jspdf.min.js"></script>
+        <script src="html2canvas.min.js"></script>
+        <script src="capture_pdf.js"></script>
+    </head>
+
+    <body>
+     <input style=" height: 20; background-color: yellow;" type="number" id="interval" value="1000" onchange="interval = document.getElementById('interval').value; re_start();"> 
+     <input style=" height: 20; background-color: yellow;" type="time" id="heure" value="17:00" onchange="heure = document.getElementById('heure').value;console.log(heure); re_start();"> 
+       
+        <div id="time0" style=" background-color: pink;" >
+        <!--h1  id="time" style="height: 50; font-size:50;  background-color: blue;"></h1  width: 770px; height: 920px; // -->
+        <h1  id="time2"style=" font-size:500%;  background-color: red;"></h1>
+        <h1  id="time"style=" font-size:500%;  background-color: cyan;"></h1>
+        </div>
+        <div id="capture">
+            <canvas id="espace" style="width:1000; height:500;  background-color: lightgray; border: 1px solid black;">
+            </canvas>
+        </div>
+    </body>
+
+    <div id="out" >
+   
+    </div>
+    
+    <p>
+     -----------------
+    </p>
+    
+    <button onclick="capture();" >PDF</button>
+    <button onclick="capture(false);" >CAPTURE IMAGE</button>
+    
+    <script async>
+        interval = 1000;
+        heure = "17:00";
+        document.getElementById('interval').value=1000;
+
+        espace = document.getElementById("espace");
+
+        pause = false;
+        play = false;
+        id=0;
+        time0 = document.getElementById("time0");
+        time = document.getElementById("time");
+        time2 = document.getElementById("time2");
+
+        function get_time(){
+            var d = new Date();
+            //time.innerHTML=""+d.toString();
+            zone = (d.getTimezoneOffset()/60);
+            zone = (zone>0)?("+"+zone):(zone);
+            time2.innerHTML=""+jour(d.getDay())+
+            " "+((d.getDate()<10)?("0"):"") +d.getDate()+
+            "/"+((d.getMonth()<9)?("0"):"") +(d.getMonth()+1)+
+            "/"+d.getFullYear()+
+            " "+((d.getHours()<10)?("0"):"") +d.getHours()+
+            ":"+((d.getMinutes()<10)?("0"):"") +d.getMinutes()+
+            ":"+((d.getSeconds()<10)?("0"):"") +d.getSeconds()+
+            ":"+((d.getMilliseconds()<10)?("00"):((d.getMilliseconds()<100)?("0"):"")) +d.getMilliseconds()+
+            " UTC"+zone;
+
+            
+            var dh = new Date(d.getFullYear()+"-"+((d.getMonth()<9)?("0"):"") +(d.getMonth()+1)+"-"+((d.getDate()<10)?("0"):"")+d.getDate()+"T"+heure+":00");
+            
+            var diff = dh.getTime()-d.getTime();
+
+            if(diff<0){
+                if(time.style["background-color"]=="cyan"){
+                    //time.style="font-size:500%;  background-color: yellow;";
+                    time.style["background-color"] ="yellow";
+                }else{
+                    //time.style="font-size:500%;  background-color: cyan;";
+                    time.style["background-color"] ="cyan";
+                }
+            }
+            
+            time.innerHTML=msToTime(diff);
+
+
+            game(d);
+        }
+
+        function time_start(){
+            return setInterval(get_time,interval);
+        }
+
+        get_time();
+        id = time_start(1000);
+        time0.addEventListener("click",function (){
+            if(pause == false){
+                pause = true;
+                document.getElementById("titre").innerHTML="TIME PAUSE";
+                clearInterval(id);
+                console.log("PAUSE");
+            }else{
+                id = time_start(1000);
+                pause = false;
+                document.getElementById("titre").innerHTML="TIME";
+                console.log("START");
+            }
+        });
+
+        espace.addEventListener("click",function (){
+            if(play){
+                play = false;
+                console.log("STOP");
+            }else{
+                play = true;
+                console.log("PLAY");
+            }
+        });
+
+
+        function re_start(){
+            if(pause == false){
+                clearInterval(id);
+                id = time_start();
+            }
+        }
+
+        function jour(nb){
+            switch(nb){
+                case 1 : return "Lundi";
+                case 2 : return "Mardi";
+                case 3 : return "Mercredi";
+                case 4 : return "Jeudi";
+                case 5 : return "Vendredi";
+                case 6 : return "Samedi";
+                case 7 : return "Dimanche";
+            }
+        }
+
+        
+        function game(date){
+            if(play){
+            var canvas = document.getElementById('espace');
+            if (canvas.getContext) {
+                var ctx = canvas.getContext('2d');
+
+                /*
+                ctx.fillStyle = 'rgb(200, 0, 0)';
+                ctx.fillRect(100, 100, 20, 20);
+
+                
+                ctx.fillStyle = "green";
+                ctx.fillRect(10, 10, 100, 100);
+                */
+
+                //ctx.fillStyle
+                //ctx.strokeStyle
+
+                
+                
+                ms = date.getTime();
+                
+                rouge = parseInt((ms)%255);
+                vert = parseInt((ms/100)%255);
+                bleu = parseInt((ms/1000)%255);
+                x= parseInt((ms/200)%290);
+                y= parseInt((ms/2000)%140);
+
+                
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba("+rouge+","+vert+","+bleu+",1)";
+                ctx.arc(x+5, y+5, 5, 0, Math.PI * 2, true);  // Cercle extérieur
+                ctx.stroke();
+                
+                /*
+                ctx.fillStyle = "rgba("+rouge+","+vert+","+bleu+",1)";
+                ctx.fillRect(x, y, 5, 5);
+                */
+
+                //console.log("-"+ms+"rgba("+rouge+","+vert+","+bleu+",1)  X="+(x+5)+",Y="+(y+5));
+            }
+            }
+        }
+
+        function msToTime(duration) {
+            var minus="";
+            if(duration<0){minus="-"; duration = Math.abs(duration);}
+            var milliseconds = parseInt((duration % 1000) ), // /100
+            seconds = parseInt((duration / 1000) % 60),
+            minutes = parseInt((duration / (1000 * 60)) % 60),
+            hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+
+            hours = (hours < 10) ? "0" + hours : hours;
+            minutes = (minutes < 10) ? "0" + minutes : minutes;
+            seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+            return minus+hours + ":" + minutes + ":" + seconds + ":" + milliseconds;
+        }
+
+    </script>
+    </html>
+
+
