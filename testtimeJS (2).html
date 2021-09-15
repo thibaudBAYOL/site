@@ -37,6 +37,16 @@
     
     <div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
     <script async type="text/javascript">
+    
+    function getMousePosition(event)
+        {
+            var e = event || window.event;
+            var scroll = new Array((document.documentElement && document.documentElement.scrollLeft) || window.pageXOffset || self.pageXOffset || document.body.scrollLeft,(document.documentElement && document.documentElement.scrollTop) || window.pageYOffset || self.pageYOffset || document.body.scrollTop);
+            return new Array(e.clientX + scroll[0] ,e.clientY + scroll[1] );
+            
+        }
+        
+        
     let id="capture";
     var mouseInfo = document.getElementById(id);
     mouseInfo.onmousemove = function(event){
@@ -44,10 +54,10 @@
         var point = document.getElementById('point');
         point.hidden=false;
         var point_style = point.style;
-        //var mousePosition = getMousePosition(event);
+        var mousePosition = getMousePosition(event);
         //mouseInfo.innerHTML = 'x:'+(mousePosition[0]-mouseInfo.offsetLeft) + 'y:'+(mousePosition[1]-mouseInfo.offsetTop);
-        point_style.left=event.clientX;//mousePosition[0];
-        point_style.top=event.clientY;//mousePosition[1];
+        point_style.left=mousePosition[0];
+        point_style.top=mousePosition[1];
     };
     </script>
         
