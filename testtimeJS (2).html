@@ -35,6 +35,22 @@
     <button onclick="capture();" >PDF</button>
     <button onclick="capture(false);" >CAPTURE IMAGE</button>
     
+    <div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
+    <script async type="text/javascript">
+    let id="espace";
+    var mouseInfo = document.getElementById(id);
+    mouseInfo.onmousemove = function(event){
+        var mouseInfo = document.getElementById(id);
+        var point = document.getElementById('point');
+        point.hidden=false;
+        var point_style = point.style;
+        //var mousePosition = getMousePosition(event);
+        //mouseInfo.innerHTML = 'x:'+(mousePosition[0]-mouseInfo.offsetLeft) + 'y:'+(mousePosition[1]-mouseInfo.offsetTop);
+        point_style.left=event.clientX;//mousePosition[0];
+        point_style.top=event.clientY;//mousePosition[1];
+    };
+    </script>
+        
     <script async>
         interval = 1000;
         heure = "17:00";
