@@ -1,0 +1,109 @@
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FIRE</title>
+    </head>
+
+
+<body>    
+
+<div id="chargeur">
+    </div>
+    <div id="mouseInfo" style="width:50%;height:50%;background:red" onmousedown="mdown()" onmouseup="mup()">
+        <div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
+    </div>
+
+
+
+
+    <script async type="text/javascript">
+
+        function getMousePosition(event) {
+            var e = event || window.event;
+            var scroll = new Array((document.documentElement && document.documentElement.scrollLeft) || window.pageXOffset || self.pageXOffset || document.body.scrollLeft, (document.documentElement && document.documentElement.scrollTop) || window.pageYOffset || self.pageYOffset || document.body.scrollTop);
+            return new Array(e.clientX + scroll[0] /*- document.body.clientLeft*/, e.clientY + scroll[1] /*- document.body.clientTop*/);
+            //return new Array(e.clientX ,e.clientY);
+        }
+
+        let id = "mouseInfo";
+
+        var mouseInfo = document.getElementById(id);
+        mouseInfo.onclick = function (e) {
+            if (mouseInfo.style.backgroundColor == "red") {
+                mouseInfo.style.backgroundColor = "blue";
+            } else {
+                mouseInfo.style.backgroundColor = "red";
+            }
+        }
+        var point = document.getElementById('point');
+
+        let fréquence_tire=40;
+        let vitesse_tire=10;
+
+
+        var fire ;
+
+        let chargeur = document.getElementById("chargeur");
+
+        function set_fire() {
+
+
+            var balle = document.createElement("div");
+            balle.style.backgroundColor="pink";
+            balle.style.width="5px";
+            balle.style.height="5px";
+            balle.style.position="absolute";
+            balle.style.left=point.style.left;
+            balle.style.top=point.style.top;
+            //style="width:10px;height:10px;background:rgb(0, 255, 0);position:absolute;"
+
+            chargeur.insertBefore(balle, chargeur.childNodes[0]);
+            //console.log("fire");
+            move_fire(chargeur,balle);
+
+        }
+
+
+        function move_fire(chargeur,balle){
+            balley = balle.style.top.replace("px", "");
+            
+            if(mouseInfo.offsetTop<balley){
+                //console.log("Y "+mouseInfo.offsetTop+" < "+ balley);
+                balle.style.top=balley-2;
+                
+                setTimeout(function(){move_fire(chargeur,balle);},vitesse_tire)
+            }else{
+                chargeur.removeChild(balle);
+            }
+
+        }
+
+        function mdown() {
+            point.style.backgroundColor = "rgb(0, 255, 0)";
+            //console.log("down");
+            fire = setInterval(function(){set_fire()},fréquence_tire);
+        }
+        function mup() {
+            point.style.backgroundColor = "yellow";
+            //console.log("up");
+            clearInterval(fire);
+        }
+
+
+        mouseInfo.onmousemove = function (event) {
+            var mouseInfo = document.getElementById(id);
+
+            point.hidden = false;
+            var point_style = point.style;
+            var mousePosition = getMousePosition(event);
+            //mouseInfo.innerHTML = 'x:' + (mousePosition[0] - mouseInfo.offsetLeft) + 'y:' + (mousePosition[1] - mouseInfo.offsetTop) + "</br>";
+            point_style.left = (mousePosition[0]-1) - (point_style.width.replace("px", ""));
+            point_style.top = (mousePosition[1]-1) - (point_style.height.replace("px", ""));
+        };
+    </script>
+  
+  
+  </body>
+  
+  </html>
