@@ -56,8 +56,8 @@
         var point_style = point.style;
         var mousePosition = getMousePosition(event);
         //mouseInfo.innerHTML = 'x:'+(mousePosition[0]-mouseInfo.offsetLeft) + 'y:'+(mousePosition[1]-mouseInfo.offsetTop);
-        point_style.left=mousePosition[0];
-        point_style.top=mousePosition[1];
+        point_style.left=(mousePosition[0]-1) - (point_style.width.replace("px", ""));
+        point_style.top=(mousePosition[1]-1) - (point_style.height.replace("px", ""));
     };
     </script>
         
