@@ -1,9 +1,121 @@
-<html>
-  <header>
-    <meta charset="utf-8">
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
     <title>VIDE</title>
-  </header>
-  <body>
-    <h1>Il n'y a rien pour le moment </h1>
-  </body>
+</head>
+
+<body>
+    <div style="height:90%;">
+
+        <article id="français">
+            <!--h1>Il n'y a rien pour l'instant</h1-->
+            <h1 id="salutation-fr">Bonjour</h1>
+            <h1> 2 pages web:</h1>
+            <nav>
+                <ol>
+                    <li title="Affiche la date et l'heure ainsi que le temps qu'il reste avant une certaine heure
+mais aussi un dessin qui evolue avec le temps et 2 boutons pour avoir le pdf ou un image du dessin."><a
+                            href="timeJS.html">TimeJS</a>: Horloge + Alarme + Dessin qui evolue dans le temps</li>
+
+                    <li
+                        title="Avec la souris un carré jaune bouge. Si tu appuis avec la sourie cela tire des carrés rose.">
+                        <a href="fire.html">Fire</a>: jeux de tire dans le vide
+                    </li>
+                </ol>
+            </nav>
+
+        </article>
+
+        <article id="english" hidden>
+            <!--h1>There is nothing for now</h1-->
+            <h1 id="salutation-en">Hello</h1>
+            <h1> 2 pages web:</h1>
+            <nav>
+                <ol>
+                    <li title="Displays the date and time as well as the time remaining before a certain time
+but also a drawing which evolves over time and 2 buttons to have the pdf or an image of the drawing."><a
+                            href="timeJS.html">TimeJS</a>: Clock + Alarm + Drawing that evolves over time</li>
+
+                    <li
+                        title="With the mouse a yellow square moves. If you press with the mouse it shooting a pink squares.">
+                        <a href="fire.html">Fire</a>: shooting games in the void
+                    </li>
+                </ol>
+            </nav>
+
+        </article>
+
+    </div>
+
+
+    <footer>
+        <spam leng="en"><a onclick="eng();change_lang('en');" onmouseover="eng();" onmouseout="retour();"
+                style="color:red;">ENGLISH</a>
+        </spam>
+        <spam leng="fr"><a onclick="fr();change_lang('fr');" onmouseover="fr();" onmouseout="retour();"
+                style="color:blue;">FRAN&CcedilAIS</a>
+        </spam>
+
+
+        <script>
+
+
+
+            function hello() {
+                date = new Date();
+                salutation = document.getElementById("salutation-en");
+                if (date.getHours() <= 12) {
+                    salutation.innerHTML = "Good morning";
+                } else if (date.getHours() < 21) {
+                    salutation.innerHTML = "Good afternoon";
+                } else {
+                    salutation.innerHTML = "Good night";
+                }
+
+            }
+            function Bonjour() {
+                date = new Date();
+                salutation = document.getElementById("salutation-fr");
+                if (date.getHours() < 17) {
+                    salutation.innerHTML = "Bonjour";
+                } else if (date.getHours() < 21) {
+                    salutation.innerHTML = "Bonsoir";
+                } else {
+                    salutation.innerHTML = "Bonne nuit";
+                }
+            }
+
+            Bonjour();
+            hello();
+
+            function change_lang(lang) {
+                document.getElementsByTagName("html")[0].lang = lang;
+            }
+            function fr() {
+                Bonjour();
+                document.getElementById("français").hidden = false;
+                document.getElementById("english").hidden = true;
+            }
+
+            function eng() {
+                hello();
+                document.getElementById("english").hidden = false;
+                document.getElementById("français").hidden = true;
+            }
+
+            function retour() {
+                if (document.getElementsByTagName("html")[0].lang == "en") {
+                    eng();
+                } else if (document.getElementsByTagName("html")[0].lang == "fr") {
+                    fr();
+                }
+            }
+        </script>
+
+
+    </footer>
+
+</body>
+
 </html>
