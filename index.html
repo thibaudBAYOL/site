@@ -3,10 +3,39 @@
 <head>
     <meta charset="utf-8" />
     <title>VIDE</title>
+
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 90%;
+            margin: 5;
+            padding: 5;
+            position: relative;
+            display: table;
+        }
+
+        
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: table-row;
+            background-color: rgb(235, 235, 235);
+            
+        }
+        
+    </style>
+
+
 </head>
 
 <body>
-    <div style="height:90%;">
+    <div>
 
         <article id="français">
             <!--h1>Il n'y a rien pour l'instant</h1-->
@@ -49,7 +78,7 @@ but also a drawing which evolves over time and 2 buttons to have the pdf or an i
     </div>
 
 
-    <footer>
+    <footer style="vertical-align: bottom;">
         <spam leng="en"><a onclick="eng();change_lang('en');" onmouseover="eng();" onmouseout="retour();"
                 style="color:red;">ENGLISH</a>
         </spam>
