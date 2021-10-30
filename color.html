@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>COLOR</title>
+</head>
+
+<body>
+
+
+    <script>
+        document.getElementsByTagName("html")[0].style.backgroundColor = "black";
+
+        var red = 0, green = 0, blue = 0;
+        var stop = false;
+        var step = 10;
+
+        function q() { stop = true; clearInterval(inst); inst = null; }
+
+        var inst = setInterval(function () { alea(); }, 1000);
+
+
+        document.getElementsByTagName("html")[0].addEventListener("dblclick", function () {
+            fullScreen();
+        });
+
+        function fullScreen() {
+            console.log("fullScreen");
+            var elem = document.getElementsByTagName("html")[0];
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+                elem.msRequestFullScreen();
+                elem.msRequestFullscreen();
+            }
+        }
+        /*
+                document.getElementsByTagName("html")[0].addEventListener('mouseup', logMouseButton);
+        
+                function logMouseButton(e) {
+                if (typeof e === 'object') {
+                    switch (e.button) {
+                    case 0:
+                        console.log('Left button clicked.');
+                        break;
+                    case 1:
+                        console.log('Middle button clicked.');
+                        backgroundColor(0,0,0);
+                        break;
+                    case 2:
+                        console.log('Right button clicked.');
+                        break;
+                    default:
+                        console.log('Unknown button code: ${e.button}');
+                    }
+                }
+                }
+        */
+
+
+        document.getElementsByTagName("html")[0].addEventListener('mouseup', function (e) {
+            if (typeof e === 'object') {
+                switch (e.button) {
+                    case 0:
+                        console.log('Left button clicked.');
+                        if_click();
+                        break;
+                    case 1:
+                        console.log('Middle button clicked.');
+                        q();
+                        backgroundColor(0, 0, 0);
+                        break;
+                    case 2:
+                        console.log('Right button clicked.');
+                        break;
+                    default:
+                        console.log('Unknown button code: ${e.button}');
+                }
+            }
+        });
+
+
+
+        function stop0() {
+            document.getElementsByTagName("title")[0].innerHTML = "STOP COLOR";
+            q();
+            document.getElementsByTagName("body")[0].innerHTML = "<h1>" + document.getElementsByTagName("html")[0].style.backgroundColor + "</h1>";
+        }
+        function start() {
+
+            if (stop == true && inst == null) {
+                document.getElementsByTagName("title")[0].innerHTML = "COLOR";
+                document.getElementsByTagName("body")[0].innerHTML = "";
+                inst = setInterval(function () { alea(); }, 1000);
+                stop = false;
+            }
+        }
+
+        function if_click() {
+            if (stop == true) {
+                start();
+            } else {
+                stop0();
+            }
+        }
+
+        function alea() {
+
+            red = Math.round(255 * Math.random());
+            green = Math.round(255 * Math.random());
+            blue = Math.round(255 * Math.random());
+
+            backgroundColor(red, green, blue);
+        }
+
+
+        function boucle() {
+            backgroundColor(red, green, blue);
+            if ((red + step) >= 255) {
+                green = (green + step) % 255;
+                if ((green + step) >= 255) blue = (blue + step) % 255;
+            }
+            red = (red + step) % 255;
+        }
+
+        function backgroundColor(red, green, blue) {
+            document.getElementsByTagName("html")[0].style.backgroundColor = "rgb(" + red + "," + green + "," + blue + ")";
+            console.log("rgb(" + red + "," + green + "," + blue + ")");
+        }
+
+    </script>
+
+</body>
+
+</html>
