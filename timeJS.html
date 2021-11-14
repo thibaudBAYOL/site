@@ -34,7 +34,7 @@
     
     <button onclick="capture();" >PDF</button>
     <button onclick="capture(false);" >CAPTURE IMAGE</button>
-    
+    <input type='button' value='Print' onclick="window.print()" />
     <div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
     <script async type="text/javascript">
     
@@ -167,28 +167,14 @@
             var canvas = document.getElementById('espace');
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d');
-
-                /*
-                ctx.fillStyle = 'rgb(200, 0, 0)';
-                ctx.fillRect(100, 100, 20, 20);
-
-                
-                ctx.fillStyle = "green";
-                ctx.fillRect(10, 10, 100, 100);
-                */
-
-                //ctx.fillStyle
-                //ctx.strokeStyle
-
-                
                 
                 ms = date.getTime();
                 
                 rouge = parseInt((ms)%255);
                 vert = parseInt((ms/100)%255);
                 bleu = parseInt((ms/1000)%255);
-                x= parseInt((ms/200)%290);
-                y= parseInt((ms/2000)%140);
+                x= parseInt((ms/200)%(canvas.width-10));
+                y= parseInt((ms/2000)%(canvas.height-10));
 
                 
                 ctx.beginPath();
@@ -196,12 +182,6 @@
                 ctx.arc(x+5, y+5, 5, 0, Math.PI * 2, true);  // Cercle extérieur
                 ctx.stroke();
                 
-                /*
-                ctx.fillStyle = "rgba("+rouge+","+vert+","+bleu+",1)";
-                ctx.fillRect(x, y, 5, 5);
-                */
-
-                //console.log("-"+ms+"rgba("+rouge+","+vert+","+bleu+",1)  X="+(x+5)+",Y="+(y+5));
             }
             }
         }
