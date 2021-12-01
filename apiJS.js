@@ -28,7 +28,7 @@ class ApiClient {
                 }, reject);
             }, reject);
         });
-
+//response.headers.get("content-type");
     }
     /**
      * GET
