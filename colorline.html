@@ -1,0 +1,98 @@
+<html style="background-color: black;">
+
+<body>
+    <div hidden>
+        <div>
+
+            <div style="padding: 2px; display: inline-block;border: solid;">
+                <p>A</p>
+                <p>A</p>
+            </div>
+            <div style="padding: 2px; display: inline-block;border: solid;">
+                <p>AAAA</p>
+                <a target="_blanc" href="BONJOUR">BONJOUR</a>
+            </div>
+        </div>
+        <div style="padding: 2px; display: inline-block;border: solid;">
+            <p>AAAA</p>
+            <a target="_blanc" href="BONJOUR">BONJOUR</a>
+        </div>
+        <div style="padding: 2px; display: inline-block;border: solid;">
+            <p>AAAA</p>
+            <a target="_blanc" href="BONJOUR">BONJOUR</a>
+        </div>
+        <div>
+
+            <h2 style="color:blueviolet;">AAAAA</h2>
+            <form action="/">
+                <input name="url">
+                <button type="submit">Recheche0</button>
+            </form>
+
+        </div>
+    </div>
+
+
+    <canvas onclick="boutons();" id="espace"
+        style="width:100%; height:100%;  background-color: lightgray; border: 1px solid black;"></canvas>
+
+</body>
+
+<script>
+
+    var rouge = 0;
+    var vert = 0;
+    var bleu = 0;
+    var x = 0;
+    var y = 0;
+    var play = false;
+    var inst = null;
+
+    step=11;
+
+    function alea() {
+
+        rouge = Math.round(255 * Math.random());
+        vert = Math.round(255 * Math.random());
+        bleu = Math.round(255 * Math.random());
+
+       
+    }
+
+
+    function game() {
+        if (play) {
+            var canvas = document.getElementById('espace');
+            if (canvas.getContext) {
+                var ctx = canvas.getContext('2d');
+                alea();
+                ctx.beginPath();
+                ctx.fillStyle  = "rgba(" + rouge + "," + vert + "," + bleu + ",0.5)";
+                ctx.arc(x + step, y + step, step, 0, Math.PI * 2, true);  // Cercle extérieur
+                ctx.fill();
+                //ctx.stroke();
+                //console.log("d-"+x+" "+y);
+                x = (x + step) % (canvas.width-step); 
+                //console.log("   m-"+x+" "+y);
+                if (x < step & x!=0){
+                    y = (y + step) % (canvas.height-step);
+                    //console.log("   -"+x+" "+y);
+                }
+            }
+        }
+    }
+
+    function boutons() {
+        if (!play) {
+            inst = setInterval(function () { game(); }, 1000);
+            play = true;
+        } else {
+            play = false;
+            clearInterval(inst);
+        }
+    }
+
+
+</script>
+
+</html>

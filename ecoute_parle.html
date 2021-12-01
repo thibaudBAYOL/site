@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Ecoute & parle</title>
+</head>
+
+<body>
+    <button id="repet" onclick="je_repet();">repet</button>
+    <button id="input" onclick="start_ecoute();">ECOUTE?</button>
+
+    <textarea id="text" placeholder="vide"></textarea>
+
+
+    <button id="output" onclick="lire_txt();">PARLE</button>
+
+    <select id="voies" onclick="maj_vois();">
+        <option value=0>PAR DEFAUT</option>
+    </select>
+
+
+    <script>
+        replay = false;
+        play = false;
+        input = document.getElementById("input");
+        output = document.getElementById("output");
+        textarea = document.getElementById("text");
+        choix_voies = document.getElementById("voies");
+        repet = document.getElementById("repet");
+
+        var message = "";
+        
+        function je_repet(){
+            replay=!replay;
+            input.innerHTML = "replay "+replay;
+            if(replay){
+                if(!play)start_ecoute();
+            }else{
+                if(play)start_ecoute();
+            }
+            
+            
+        }
+
+        function step() {
+            if(replay){
+                start_ecoute();
+                lire_txt();
+                textarea.value = "";
+                start_ecoute();
+            }
+        }
+
+
+
+
+        function reset() {
+            play = false;
+            input.innerHTML = "ECOUTE (PAUSE)";
+            console.log("fin d'écoute");
+        }
+        reset();
+        // ecouter
+        try {
+
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+
+            recognition.onresult = function (event) {
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        txt = event.results[i][0].transcript;
+                        textarea.value += txt;
+                        message = txt;
+                        console.log(txt);
+                        step();
+                    }
+                }
+            }
+
+            recognition.onend = reset();
+
+
+
+
+            function start_ecoute() {
+                if (!play) {
+                    play = true;
+                    recognition.start();
+                    input.innerHTML = "ECOUTE (EN COURE)";
+                } else {
+                    recognition.stop();
+                    reset();
+                }
+            }
+
+        } catch (err) {
+            input.disabled = true
+            console.log(err);
+        }
+        // lire
+
+
+        //choix_voies.add
+
+        function lire_txt() {
+            var utterance = new SpeechSynthesisUtterance(message);
+            utterance.voice=list_voies[choix_voies.value];
+            speechSynthesis.speak(utterance);
+        }
+
+        var list_voies = window.speechSynthesis.getVoices();
+
+        function maj_vois() {
+            if (list_voies.length == 0) {
+                list_voies = window.speechSynthesis.getVoices();
+                console.log("=" + list_voies);
+
+                for(id = 0; id < list_voies.length;id++) {
+                    element = list_voies[id];
+                    if (element.default) {
+                        choix_voies.children[0].innerText = element.name + "(DEFAUT)"
+                    } else {
+                        var option = document.createElement("option");
+                        option.text = element.name;
+                        option.value = id;
+                        choix_voies.appendChild(option);
+                    }
+                }
+
+            }
+        }
+
+
+
+    </script>
+
+
+</body>
+
+</html>
