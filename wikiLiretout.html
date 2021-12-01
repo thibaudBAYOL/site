@@ -1,0 +1,190 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="apiJS.js"></script>
+</head>
+
+<body style="font-size:40px; background-color: rgb(100, 100, 100); color:white">
+    <h>Works with a server that returns the content of a page (http: // localhost: 1234 / url = (site url))</h>
+    <div id="tete"></div>
+    <br>
+    <button onclick="hid();">CACHE</button>
+    <div id="data">
+
+    </div>
+    <div id="end"></div>
+    <script>
+        function hid() {
+            console.log("HID tete");
+            tete = document.getElementById('tete');
+            tete.hidden = !tete.hidden;
+        }
+
+
+        title = "TTT";
+
+        console.log("COOKIE:" + document.cookie);
+
+        var date = new Date();
+        date.setDate(date.getDate() + 365);
+        date = date.toUTCString();
+        console.log(date);
+
+        console.log("1");
+        function setCookie() {
+            console.log("setCookie()");
+            //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
+            title = title.replace(/ /g, "");
+            json = { "id": idactuel, "title": title };
+            let co = "myCookie=" + JSON.stringify(json) + "; expires=" + date + ' ; samesite=strict';
+            console.log("setCookie:" + co)
+            document.cookie = co;
+        }
+
+        console.log("2");
+        idactuel = -1;
+        function voir_marque_page(id) {
+            console.log("voir_marque_page(" + id + ")");
+            if (id >= 0) {
+                document.location = "#" + id;
+                idactuel = id;
+                setCookie();
+            }
+        }
+        console.log("3");
+
+        function epingle_de_fin() {
+
+            console.log("end??");
+            var spam = document.getElementsByTagName("span");
+            max = spam.length;
+            for (const key in spam) {
+
+
+                
+
+                try {
+                    spam[key].addEventListener("click", function () {
+                        voir_marque_page(key);
+                        spam[key].style = "font-weight: bold;";
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+
+
+                spam[key].id = key;
+
+                
+
+                cont=spam[key].innerHTML;
+
+                if(cont.match(/<a style/i)==null){
+                    spam[key].innerHTML="<a style='color:white;text-decoration: none;' href='#"+(spam[key].id)+"'>"+cont+"</a>";
+                }
+
+            }
+        }
+
+
+        function err(s) { console.log("ERR:" + s); alert("ERR:" + s); }
+
+        if (document.getElementById("data").innerHTML.match(/<div/i) == null) {
+
+            try {
+
+
+
+                var api = new ApiClient();
+                url = "http://xxx.url.xxx";
+                cmp = 1;
+
+                function pelle(doc) {
+
+                    entry_header = doc.getElementsByClassName("entry-header")[0].outerHTML;
+                    //<!-- .entry-header -->
+                    entry_content = doc.getElementsByClassName("entry-content")[0].outerHTML;
+                    //<!-- .entry-content -->
+                    entry_footer = doc.getElementsByClassName("entry-footer")[0].outerHTML;
+
+                    doc.innerHTML = "";
+
+                    doc.innerHTML = entry_header + entry_content + entry_footer;
+                    console.log("PELLE");
+                }
+
+
+
+
+                function new_page(html) {
+                    console.log('new page+')
+                    doc = document.getElementById("data");
+                    div = document.createElement("div");
+                    div.id = "chap" + cmp;
+                    cmp++;
+                    doc.insertBefore(div, doc.childNodes[doc.childNodes.length - 1]);
+                    div.innerHTML = html;
+                    pelle(div);
+
+                    trouve = div.innerHTML.match(/href=\"([^\"]*)\"[^>]*>[^N]*Next Chapter/i);
+                    if (trouve != null) {
+                        url = trouve[1];
+                        console.log("+d'url:" + url);
+                        recherche(url);
+                    } else {
+                        epingle_de_fin();
+                    }
+                }
+
+                function recherche(url) {
+                    api.get("http://localhost:1234/url=" + url).then(function (txt) {
+                        document.getElementById("tete").innerHTML += "<a href='#chap" + cmp + "'>" + url + "</a><br>";
+                        new_page(txt);
+                    }, err);
+                }
+
+                recherche(url);
+
+            } catch (e) {
+
+            }
+
+        } else {
+            console.log("okup")
+            epingle_de_fin();
+        }
+
+
+
+
+
+        console.log("4");
+
+        if (!document.cookie.includes("myCookie=")) {
+            console.log("ADD " + document.cookie);
+            setCookie();
+        } else {
+            console.log("document.cookie lercture");
+            tab_cookies = document.cookie.split(";");
+            tab_cookies.forEach(element => {
+                if (element.startsWith("myCookie=")) {
+                    json = JSON.parse(element.replace("myCookie=", ""));
+                    title = title.replace(/ /g, "");
+                    if (json.title.match(title)) {
+                        voir_marque_page(json.id);
+                    } else {
+                        voir_marque_page(0);
+                    }
+                }
+            });
+        }
+        console.log("FIN");
+
+
+
+        //api.get(url,headers).then(function (txt) {}, err);
+    </script>
+</body>
+
+</html>
