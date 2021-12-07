@@ -14,7 +14,10 @@
 
         var red = 0, green = 0, blue = 0;
         var stop = false;
-        var step = 10;
+        var step = 5;
+        var stepR = step;
+        var stepG = step;
+        var stepB = step;
 
         function q() { stop = true; clearInterval(inst); inst = null; }
 
@@ -63,15 +66,17 @@
                 switch (e.button) {
                     case 0:
                         console.log('Left button clicked.');
-                        if_click();
+                        if_click(true);
                         break;
                     case 1:
                         console.log('Middle button clicked.');
                         q();
+                        red = 0, green = 0, blue = 0;
                         backgroundColor(0, 0, 0);
                         break;
                     case 2:
                         console.log('Right button clicked.');
+                        if_click(false);
                         break;
                     default:
                         console.log('Unknown button code: ${e.button}');
@@ -86,19 +91,23 @@
             q();
             document.getElementsByTagName("body")[0].innerHTML = "<h1>" + document.getElementsByTagName("html")[0].style.backgroundColor + "</h1>";
         }
-        function start() {
+        function start(aleat=true) {
 
             if (stop == true && inst == null) {
                 document.getElementsByTagName("title")[0].innerHTML = "COLOR";
                 document.getElementsByTagName("body")[0].innerHTML = "";
-                inst = setInterval(function () { alea(); }, 1000);
+                if(aleat){
+                    inst = setInterval(function () { alea(); }, 1000);
+                }else{
+                    inst = setInterval(function () { boucle(); }, 100);
+                }
                 stop = false;
             }
         }
 
-        function if_click() {
+        function if_click(aleat=true) {
             if (stop == true) {
-                start();
+                start(aleat);
             } else {
                 stop0();
             }
@@ -116,11 +125,18 @@
 
         function boucle() {
             backgroundColor(red, green, blue);
-            if ((red + step) >= 255) {
-                green = (green + step) % 255;
-                if ((green + step) >= 255) blue = (blue + step) % 255;
+            if ((red + stepR) >= 255 || (red + stepR) <= 0) {
+                stepR = (-stepR);
+                if ((green + stepG) >= 255 || (green + stepG) <= 0){
+                    stepG = (-stepG);
+                    if ((blue + stepB) >= 255 || (blue + stepB) <= 0){
+                        stepB = (-stepB);
+                    }
+                    blue = (blue + stepB) % 255;
+                } 
+                green = (green + stepG) % 255;
             }
-            red = (red + step) % 255;
+            red = (red + stepR) % 255;
         }
 
         function backgroundColor(red, green, blue) {
