@@ -1,208 +1,242 @@
+<html>
 
-    <html>
+<head>
+    <meta charset="UTF-8">
+    <title id="titre">TIME</title>
+    <script src="jspdf.min.js"></script>
+    <script src="html2canvas.min.js"></script>
+    <script src="capture_pdf.js"></script>
+</head>
 
-    <head>
-        <meta charset="UTF-8">
-        <title id="titre">TIME</title>
-        <script src="jspdf.min.js"></script>
-        <script src="html2canvas.min.js"></script>
-        <script src="capture_pdf.js"></script>
-    </head>
+<body>
+    <input style=" height: 20; background-color: yellow;" type="number" id="interval" value="1000"
+        onchange="interval = document.getElementById('interval').value; re_start();">
+    <input style=" height: 20; background-color: yellow;" type="time" id="heure" value="17:00"
+        onchange="heure = document.getElementById('heure').value;console.log(heure); re_start();">
 
-    <body>
-     <input style=" height: 20; background-color: yellow;" type="number" id="interval" value="1000" onchange="interval = document.getElementById('interval').value; re_start();"> 
-     <input style=" height: 20; background-color: yellow;" type="time" id="heure" value="17:00" onchange="heure = document.getElementById('heure').value;console.log(heure); re_start();"> 
-       
-        <div id="time0" style=" background-color: pink;" >
+    <div id="time0" style=" background-color: pink;">
         <!--h1  id="time" style="height: 50; font-size:50;  background-color: blue;"></h1  width: 770px; height: 920px; // -->
-        <h1  id="time2"style=" font-size:500%;  background-color: red;"></h1>
-        <h1  id="time"style=" font-size:500%;  background-color: cyan;"></h1>
-        </div>
-        <div id="capture">
-            <canvas id="espace" style="width:1000; height:500;  background-color: lightgray; border: 1px solid black;">
-            </canvas>
-        </div>
-    </body>
-
-    <div id="out" >
-   
+        <h1 id="time2" style=" font-size:500%;  background-color: red;"></h1>
+        <h1 id="time" style=" font-size:500%;  background-color: cyan;"></h1>
     </div>
-    
-    <p>
-     -----------------
-    </p>
-    
-    <button onclick="capture();" >PDF</button>
-    <button onclick="capture(false);" >CAPTURE IMAGE</button>
-    <input type='button' value='Print' onclick="window.print()" />
-    <div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
-    <script async type="text/javascript">
-    
-    function getMousePosition(event)
-        {
-            var e = event || window.event;
-            var scroll = new Array((document.documentElement && document.documentElement.scrollLeft) || window.pageXOffset || self.pageXOffset || document.body.scrollLeft,(document.documentElement && document.documentElement.scrollTop) || window.pageYOffset || self.pageYOffset || document.body.scrollTop);
-            return new Array(e.clientX + scroll[0] ,e.clientY + scroll[1] );
-            
-        }
-        
-        
-    let id="capture";
+    <div id="capture">
+        <canvas id="espace" style="width:1000; height:500;  background-color: lightgray; border: 1px solid black;">
+        </canvas>
+    </div>
+</body>
+
+<div id="out">
+
+</div>
+
+<p>
+    -----------------
+</p>
+
+<button onclick="capture();">PDF</button>
+<button onclick="capture(false);">CAPTURE IMAGE</button>
+<input type='button' value='Print' onclick="window.print()" />
+<div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
+<script async type="text/javascript">
+
+    function getMousePosition(event) {
+        var e = event || window.event;
+        var scroll = new Array((document.documentElement && document.documentElement.scrollLeft) || window.pageXOffset || self.pageXOffset || document.body.scrollLeft, (document.documentElement && document.documentElement.scrollTop) || window.pageYOffset || self.pageYOffset || document.body.scrollTop);
+        return new Array(e.clientX + scroll[0], e.clientY + scroll[1]);
+
+    }
+
+
+    let id = "capture";
     var mouseInfo = document.getElementById(id);
-    mouseInfo.onmousemove = function(event){
+    mouseInfo.onmousemove = function (event) {
         var mouseInfo = document.getElementById(id);
         var point = document.getElementById('point');
-        point.hidden=false;
+        point.hidden = false;
         var point_style = point.style;
         var mousePosition = getMousePosition(event);
         //mouseInfo.innerHTML = 'x:'+(mousePosition[0]-mouseInfo.offsetLeft) + 'y:'+(mousePosition[1]-mouseInfo.offsetTop);
-        point_style.left=(mousePosition[0]-1) - (point_style.width.replace("px", ""));
-        point_style.top=(mousePosition[1]-1) - (point_style.height.replace("px", ""));
+        point_style.left = (mousePosition[0] - 1) - (point_style.width.replace("px", ""));
+        point_style.top = (mousePosition[1] - 1) - (point_style.height.replace("px", ""));
     };
-    </script>
-        
-    <script async>
-        interval = 1000;
-        heure = "17:00";
-        document.getElementById('interval').value=1000;
+</script>
 
-        espace = document.getElementById("espace");
+<script async>
+    interval = 1000;
+    heure = "17:00";
+    document.getElementById('interval').value = 1000;
 
-        pause = false;
-        play = true;
-        id=0;
-        time0 = document.getElementById("time0");
-        time = document.getElementById("time");
-        time2 = document.getElementById("time2");
+    espace = document.getElementById("espace");
 
-        function get_time(){
-            var d = new Date();
-            //time.innerHTML=""+d.toString();
-            zone = (d.getTimezoneOffset()/60);
-            zone = (zone>0)?("+"+zone):(zone);
-            time2.innerHTML=""+jour(d.getDay())+
-            " "+((d.getDate()<10)?("0"):"") +d.getDate()+
-            "/"+((d.getMonth()<9)?("0"):"") +(d.getMonth()+1)+
-            "/"+d.getFullYear()+
-            " "+((d.getHours()<10)?("0"):"") +d.getHours()+
-            ":"+((d.getMinutes()<10)?("0"):"") +d.getMinutes()+
-            ":"+((d.getSeconds()<10)?("0"):"") +d.getSeconds()+
-            ":"+((d.getMilliseconds()<10)?("00"):((d.getMilliseconds()<100)?("0"):"")) +d.getMilliseconds()+
-            " UTC"+zone;
+    pause = false;
+    play = true;
+    id = 0;
+    time0 = document.getElementById("time0");
+    time = document.getElementById("time");
+    time2 = document.getElementById("time2");
 
-            
-            var dh = new Date(d.getFullYear()+"-"+((d.getMonth()<9)?("0"):"") +(d.getMonth()+1)+"-"+((d.getDate()<10)?("0"):"")+d.getDate()+"T"+heure+":00");
-            
-            var diff = dh.getTime()-d.getTime();
-
-            if(diff<0){
-                if(time.style["background-color"]=="cyan"){
-                    //time.style="font-size:500%;  background-color: yellow;";
-                    time.style["background-color"] ="yellow";
-                }else{
-                    //time.style="font-size:500%;  background-color: cyan;";
-                    time.style["background-color"] ="cyan";
-                }
-            }
-            
-            time.innerHTML=msToTime(diff);
+    rouge = 0;
+    vert = 0;
+    bleu = 0;
+    bonus = 0;
 
 
-            game(d);
-        }
-
-        function time_start(){
-            return setInterval(get_time,interval);
-        }
-
-        get_time();
-        id = time_start(1000);
-        time0.addEventListener("click",function (){
-            if(pause == false){
-                pause = true;
-                document.getElementById("titre").innerHTML="TIME PAUSE";
-                clearInterval(id);
-                console.log("PAUSE");
-            }else{
-                id = time_start(1000);
-                pause = false;
-                document.getElementById("titre").innerHTML="TIME";
-                console.log("START");
-            }
-        });
-
-        espace.addEventListener("click",function (){
-            if(play){
-                play = false;
-                console.log("STOP");
-            }else{
-                play = true;
-                console.log("PLAY");
-            }
-        });
+    var step = 5;
+        var stepR = step;
+        var stepG = step;
+        var stepB = step;
 
 
-        function re_start(){
-            if(pause == false){
-                clearInterval(id);
-                id = time_start();
+    function get_time() {
+        var d = new Date();
+        //time.innerHTML=""+d.toString();
+        zone = (d.getTimezoneOffset() / 60);
+        zone = (zone > 0) ? ("+" + zone) : (zone);
+        time2.innerHTML = "" + jour(d.getDay()) +
+            " " + ((d.getDate() < 10) ? ("0") : "") + d.getDate() +
+            "/" + ((d.getMonth() < 9) ? ("0") : "") + (d.getMonth() + 1) +
+            "/" + d.getFullYear() +
+            " " + ((d.getHours() < 10) ? ("0") : "") + d.getHours() +
+            ":" + ((d.getMinutes() < 10) ? ("0") : "") + d.getMinutes() +
+            ":" + ((d.getSeconds() < 10) ? ("0") : "") + d.getSeconds() +
+            ":" + ((d.getMilliseconds() < 10) ? ("00") : ((d.getMilliseconds() < 100) ? ("0") : "")) + d.getMilliseconds() +
+            " UTC" + zone;
+
+
+        var dh = new Date(d.getFullYear() + "-" + ((d.getMonth() < 9) ? ("0") : "") + (d.getMonth() + 1) + "-" + ((d.getDate() < 10) ? ("0") : "") + d.getDate() + "T" + heure + ":00");
+
+        var diff = dh.getTime() - d.getTime();
+
+        if (diff < 0) {
+            if (time.style["background-color"] == "cyan") {
+                //time.style="font-size:500%;  background-color: yellow;";
+                time.style["background-color"] = "yellow";
+            } else {
+                //time.style="font-size:500%;  background-color: cyan;";
+                time.style["background-color"] = "cyan";
             }
         }
 
-        function jour(nb){
-            switch(nb){
-                case 1 : return "Lundi";
-                case 2 : return "Mardi";
-                case 3 : return "Mercredi";
-                case 4 : return "Jeudi";
-                case 5 : return "Vendredi";
-                case 6 : return "Samedi";
-                case 7 : return "Dimanche";
-            }
-        }
+        time.innerHTML = msToTime(diff);
 
-        
-        function game(date){
-            if(play){
+
+        game(d);
+    }
+
+    function time_start() {
+        return setInterval(get_time, interval);
+    }
+
+    get_time();
+    id = time_start(1000);
+    time0.addEventListener("click", function () {
+        if (pause == false) {
+            pause = true;
+            document.getElementById("titre").innerHTML = "TIME PAUSE";
+            clearInterval(id);
+            console.log("PAUSE");
+        } else {
+            id = time_start(1000);
+            pause = false;
+            document.getElementById("titre").innerHTML = "TIME";
+            console.log("START");
+        }
+    });
+
+    espace.addEventListener("click", function () {
+        if (play) {
+            play = false;
+            console.log("STOP");
+        } else {
+            play = true;
+            console.log("PLAY");
+        }
+    });
+
+
+    function re_start() {
+        if (pause == false) {
+            clearInterval(id);
+            id = time_start();
+        }
+    }
+
+    function jour(nb) {
+        switch (nb) {
+            case 1: return "Lundi";
+            case 2: return "Mardi";
+            case 3: return "Mercredi";
+            case 4: return "Jeudi";
+            case 5: return "Vendredi";
+            case 6: return "Samedi";
+            case 7: return "Dimanche";
+        }
+    }
+
+
+    function game(date) {
+        if (play) {
             var canvas = document.getElementById('espace');
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d');
-                
-                ms = date.getTime();
-                
-                rouge = parseInt((ms)%255);
-                vert = parseInt((ms/100)%255);
-                bleu = parseInt((ms/1000)%255);
-                x= parseInt((ms/200)%(canvas.width-10));
-                y= parseInt((ms/2000)%(canvas.height-10));
 
-                
+                ms = date.getTime();
+
+                if (bonus == 1) {
+                    rouge = ((rouge + step) % 255);
+                    vert = ((vert + step) % 255);
+                    bleu = ((bleu + step) % 255);
+
+                } else if (bonus == 2) {
+                    
+        
+                    if ((rouge + stepR) >= 255 || (rouge + stepR) <= 0) {
+                        stepR = (-stepR);
+                        if ((vert + stepG) >= 255 || (vert + stepG) <= 0) {
+                            stepG = (-stepG);
+                            if ((bleu + stepB) >= 255 || (bleu + stepB) <= 0) {
+                                stepB = (-stepB);
+                            }
+                            bleu = (bleu + stepB) % 255;
+                        }
+                        vert = (vert + stepG) % 255;
+                    }
+                    rouge = (rouge + stepR) % 255;
+
+                } else {
+                    rouge = parseInt((ms) % 255);
+                    vert = parseInt((ms / 100) % 255);
+                    bleu = parseInt((ms / 1000) % 255);
+                }
+                x = parseInt((ms / 200) % (canvas.width - 10));
+                y = parseInt((ms / 2000) % (canvas.height - 10));
+
+
                 ctx.beginPath();
-                ctx.strokeStyle = "rgba("+rouge+","+vert+","+bleu+",1)";
-                ctx.arc(x+5, y+5, 5, 0, Math.PI * 2, true);  // Cercle extérieur
+                ctx.strokeStyle = "rgba(" + rouge + "," + vert + "," + bleu + ",1)";
+                ctx.arc(x + 5, y + 5, 5, 0, Math.PI * 2, true);  // Cercle extérieur
                 ctx.stroke();
-                
-            }
+
             }
         }
+    }
 
-        function msToTime(duration) {
-            var minus="";
-            if(duration<0){minus="-"; duration = Math.abs(duration);}
-            var milliseconds = parseInt((duration % 1000) ), // /100
+    function msToTime(duration) {
+        var minus = "";
+        if (duration < 0) { minus = "-"; duration = Math.abs(duration); }
+        var milliseconds = parseInt((duration % 1000)), // /100
             seconds = parseInt((duration / 1000) % 60),
             minutes = parseInt((duration / (1000 * 60)) % 60),
             hours = parseInt((duration / (1000 * 60 * 60)) % 24);
 
-            hours = (hours < 10) ? "0" + hours : hours;
-            minutes = (minutes < 10) ? "0" + minutes : minutes;
-            seconds = (seconds < 10) ? "0" + seconds : seconds;
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
 
-            return minus+hours + ":" + minutes + ":" + seconds + ":" + milliseconds;
-        }
+        return minus + hours + ":" + minutes + ":" + seconds + ":" + milliseconds;
+    }
 
-    </script>
-        <footer><a href="index.html">Accueil/Home</a></footer>
-    </html>
+</script>
+<footer><a href="index.html">Accueil/Home</a></footer>
 
-
+</html>

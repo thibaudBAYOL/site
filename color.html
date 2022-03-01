@@ -18,6 +18,7 @@
         var stepR = step;
         var stepG = step;
         var stepB = step;
+        var com = false;
 
         function q() { stop = true; clearInterval(inst); inst = null; }
 
@@ -141,7 +142,7 @@
 
         function backgroundColor(red, green, blue) {
             document.getElementsByTagName("html")[0].style.backgroundColor = "rgb(" + red + "," + green + "," + blue + ")";
-            console.log("rgb(" + red + "," + green + "," + blue + ")");
+            if(com) console.log("rgb(" + red + "," + green + "," + blue + ")");
         }
 
     </script>

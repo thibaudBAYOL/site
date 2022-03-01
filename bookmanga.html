@@ -1,0 +1,308 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Airtable</title>
+    <script src="apiJS.js"></script>
+    <script src="apiAirtable.js"></script>
+
+    <style>
+        html {
+            background-color: gray;
+        }
+
+        table,
+        td,
+        th {
+            border: 1px solid;
+        }
+
+        table {
+            border-collapse: collapse;
+            background-color: lightgrey;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div>
+        <button id="b_deco" onclick="co_deco()" hidden>CONNECTION</button>
+        <div id="co">
+            <input type="text" id="login" />
+            <input type="password" id="mdp" />
+            <button onclick="connection()">CONNECTION</button>
+        </div>
+    </div>
+
+    <div>
+        <button id="add" onclick="add()">add</button>
+        <div id="f_add" hidden>
+            <textarea type="textarea" placeholder="titre" id="titre" required></textarea>
+            <textarea type="textarea" placeholder="option" id="add_option" required></textarea>
+            <textarea type="textarea" id="lien" placeholder="lien" required></textarea>
+            <button onclick="b_add()">add</button>
+        </div>
+    </div>
+
+    <div>
+        <button id="list" onclick="list()">list</button>
+        <div id="f_filter" hidden>
+            <div>
+                <textarea type="textarea" id="search"></textarea>
+                <select id="andor">
+                    <option value="AND">AND</option>
+                    <option value="OR">OR</option>
+                </select>
+                <button onclick="b_search()">search</button>
+            </div>
+            <div>
+                <button onclick="f_all()">ALL</button>
+                <button onclick="one()">ONE</button>
+                <button onclick="last()">last</button>
+                <button onclick="old()">old</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="update" hidden>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>urls</th>
+                <th>option</th>
+            </tr>
+            <tr>
+                <td id="up_id">ID</td>
+                <td><textarea type="textarea" placeholder="titre" id="up_titre" required></textarea>
+                    <button onclick="up_titre()">M</button>
+                </td>
+                <td><textarea type="textarea" placeholder="lien" id="up_lien" required></textarea>
+                    <button onclick="up_lien()">M</button>
+                </td>
+                <td><textarea type="textarea" placeholder="option" id="up_option" required></textarea>
+                    <button onclick="up_option()">M</button>
+                </td>
+            </tr>
+        </table>
+        <button onclick="up_stop()">stop Update</button>
+    </div>
+
+
+    <div id="data">
+
+    </div>
+
+
+</body>
+
+<script>
+    var myAirtable;
+
+    let table = "table1";
+
+    var update_id = undefined;
+    var confirm_sup = false;
+
+    function list() {
+        list0 = document.getElementById("f_filter");
+        list0.hidden = !list0.hidden;
+    }
+    function add() {
+        add0 = document.getElementById("f_add");
+        add0.hidden = !add0.hidden;
+    }
+
+    function b_add() {
+        //titre // add_option // lien
+        const titre = document.getElementById("titre").value;
+        const add_option = document.getElementById("add_option").value;
+        const lien = document.getElementById("lien").value;
+        myAirtable.addAirtable([{ 'fields': { 'Name': titre, 'urls': lien, 'option': add_option } }]).then(log);
+    }
+
+    function b_search() {
+        option = document.getElementById("search").value;
+        andor = document.getElementById("andor").value;
+        tab = option.split("\n");
+        var s = "";
+        for (var i = 0; i < tab.length; i++) {
+            if (i > 0) s += ",";
+            s += "FIND(\'" + tab[i] + "\',option)";
+        }
+        if (tab.length > 1) {
+            s = andor + "(" + s + ")";
+        }
+        myAirtable.getAirtable(null, "filterByFormula=" + s + "&pageSize=10").then(print_table);
+    }
+
+
+
+    function one() {
+        myAirtable.getAirtable(null, 'pageSize=1').then(print_table);
+    }
+
+    function f_all() {
+        myAirtable.getAirtable(null, "pageSize=10").then(print_table);
+    }
+
+    function old() {
+        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=asc&pageSize=10").then(print_table);
+    }
+    function last() {
+        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=desc&pageSize=10").then(print_table);
+    }
+
+    function print_table(rep) {
+        if (rep.records.length >= 1) {
+            table_header = "<tr>";
+
+
+            table_header += "<th>Name</th>";
+            table_header += "<th>urls</th>";
+            table_header += "<th>Last Modified</th>";
+            table_header += "<th>option</th>";
+            table_header += "<th> createdTime </th>";
+            table_header += "<th> update </th>";
+            table_header += "<th> suprime </th>";
+            table_header += "</tr>";
+            contenu = "";
+            rep.records.forEach(element => {
+                contenu += "<tr id=" + element.id + ">";
+
+                contenu += "<td class=titre value='" + element.fields.Name + "'>";
+                contenu += many_title(element.fields.Name);
+                contenu += "</td>";
+
+                contenu += "<td class=lien value='" + element.fields.urls + "'>";
+                contenu += many_link(element.fields.urls);
+                contenu += "</td>";
+
+                contenu += "<td>";
+                contenu += element.fields['Last Modified'];
+                contenu += "</td>";
+                contenu += "<td  class=option value='" + element.fields.option + "'>";
+                contenu += element.fields.option;
+                contenu += "</td>";
+                contenu += "<td>";
+                contenu += element.createdTime;
+                contenu += "</td>";
+
+                contenu += "<td>";
+                contenu += "<button onclick=\"update('" + element.id + "')\">M</button>";
+                contenu += "</td>";
+
+                contenu += "<td>";
+                contenu += "<button onclick=\"sup('" + element.id + "','"+element.fields.Name.split("\n")[0]+"')\">M</button>";
+                contenu += "</td>";
+
+                contenu += "</tr>";
+
+            });
+            if (rep.offset != null) {
+                my_next = "<button onclick=\"next('" + rep.offset + "')\">next</button>";
+            } else {
+                my_next = "";
+            }
+            document.getElementById('data').innerHTML = "<table>" + table_header + contenu + "</table>" + my_next;
+        } else {
+            document.getElementById('data').innerHTML = "<h3>NO FOUND</h3>"
+        }
+    }
+
+    function update(id) {
+        update_id = id;
+        document.getElementById("up_id").innerHTML = id;
+        document.getElementById("update").hidden = false;
+        titre = document.getElementById(id).getElementsByClassName("titre")[0].attributes[1].value;
+        document.getElementById("up_titre").value = titre;
+        lien = document.getElementById(id).getElementsByClassName("lien")[0].attributes[1].value;
+        document.getElementById("up_lien").value = lien;
+        option = document.getElementById(id).getElementsByClassName("option")[0].attributes[1].value;
+        document.getElementById("up_option").value = option;
+        //myAirtable.updateAirtable([{'id':id,'fields':{ 'Name': titre, 'urls': lien, 'option': add_option }}]).then(log);
+    }
+
+    function up_titre() {
+        titre = document.getElementById("up_titre").value;
+        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'Name': titre } }]).then(log);
+    }
+    function up_lien() {
+        lien = document.getElementById("up_lien").value;
+        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]).then(log);
+    }
+    function up_option() {
+        option = document.getElementById("up_option").value;
+        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
+    }
+
+    function up_stop() {
+        document.getElementById("update").hidden = true;
+    }
+
+    function sup(id,titre) {
+        const titre0 = titre.split("\n")[0];
+        if (confirm("Confirmé la supression de "+titre0) == true) {
+            myAirtable.deleteAirtable([id]).then(log);
+        }
+    }
+
+    function log(rep) {
+        document.getElementById('data').innerHTML = JSON.stringify(rep);
+    }
+    function next(offset) {
+        myAirtable.getAirtable(null, 'offset=' + offset).then(print_table);
+    }
+
+    function many_link(urls) {
+        const tab = urls.split("\n");
+        var s = "";
+        for (var i = 0; i < tab.length; i++) {
+            s += "<a href=" + tab[i] + ">" + tab[i] + "</a></br>";
+        }
+        return s;
+    }
+    function many_title(titles) {
+        const tab = titles.split("\n");
+        var s = "";
+        for (var i = 0; i < tab.length; i++) {
+            s += tab[i] + "</br>";
+        }
+        return s;
+    }
+
+
+    function co_deco() {
+        co = document.getElementById("co");
+        co.hidden = !co.hidden;
+        b = document.getElementById("b_deco");
+        b.hidden = !b.hidden;
+    }
+    function connection() {
+        login = document.getElementById("login").value;
+        mdp = document.getElementById("mdp").value;
+        myAirtable = new ApiAirtable(login, table, mdp);
+        localStorage.setItem("login", login);
+        localStorage.setItem("mdp", mdp);
+        co_deco();
+    }
+
+    if ((login = localStorage.getItem("login")) != null && (mdp = localStorage.getItem("mdp")) != null) {
+        myAirtable = new ApiAirtable(login, table, mdp);
+        co_deco();
+    }
+
+    //bookmanga.html
+
+    //sessionStorage.setItem("lastname", "Smith");
+    //sessionStorage.getItem("lastname");
+
+    //localStorage.setItem("lastname", "Smith");
+    //localStorage.getItem("lastname");
+
+
+
+</script>
+
+</html>
