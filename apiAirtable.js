@@ -51,7 +51,7 @@ class ApiAirtable {
         var url = "https://api.Airtable.com/v0/" + this.DB +
             "/" + this.table;
 
-        data = JSON.stringify({ "records": list });
+        const data = JSON.stringify({ "records": list });
         //data= "{\"records\":[{\"fields\":{\"Name\":\"88\"} } ]}";
         return this.myapiJS.post(url, data, this.myHeaders, true);
 
@@ -70,7 +70,7 @@ class ApiAirtable {
         var url = "https://api.Airtable.com/v0/" + this.DB +
             "/" + this.table;
 
-        data = JSON.stringify({ "records": list });
+        const data = JSON.stringify({ "records": list });
         //data= "{\"records\":[{\"fields\":{\"Name\":\"88\"} } ]}";
         console.log(data);
         return this.myapiJS.patch(url, data, this.myHeaders, true);
