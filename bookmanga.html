@@ -21,6 +21,24 @@
             border-collapse: collapse;
             background-color: lightgrey;
         }
+        #co{
+            background-color: rgba(255, 255, 0, 0.514);
+        }
+        #f_add{
+            background-color: pink;
+        }
+        #f_filter{
+            background-color: rgba(0, 255, 255, 0.308);
+        }
+
+        #update{
+            background-color: rgba(128, 0, 128, 0.52);
+        }
+
+        #data{
+            background-color: rgba(81, 144, 81, 0.527);
+        }
+
     </style>
 </head>
 
@@ -97,6 +115,9 @@
 
 
     <div id="data">
+
+    </div>
+    <div id="info">
 
     </div>
 
@@ -254,7 +275,7 @@
     }
 
     function log(rep) {
-        document.getElementById('data').innerHTML = JSON.stringify(rep);
+        document.getElementById('info').innerHTML = JSON.stringify(rep);
     }
     function next(offset) {
         myAirtable.getAirtable(null, 'offset=' + offset).then(print_table);
