@@ -54,13 +54,17 @@
                     <option value="AND">AND</option>
                     <option value="OR">OR</option>
                 </select>
+                <select id="sort">
+                    <option value="desc" selected >last</option>
+                    <option value="asc">old</option>
+                </select>
                 <button onclick="b_search()">search</button>
             </div>
             <div>
                 <button onclick="f_all()">ALL</button>
                 <button onclick="one()">ONE</button>
-                <button onclick="last()">last</button>
-                <button onclick="old()">old</button>
+                <button onclick="my_sort('desc')">last</button>
+                <button onclick="my_sort('asc')">old</button>
             </div>
         </div>
     </div>
@@ -125,6 +129,7 @@
     function b_search() {
         option = document.getElementById("search").value;
         andor = document.getElementById("andor").value;
+        sort = document.getElementById("sort").value;
         tab = option.split("\n");
         var s = "";
         for (var i = 0; i < tab.length; i++) {
@@ -134,7 +139,7 @@
         if (tab.length > 1) {
             s = andor + "(" + s + ")";
         }
-        myAirtable.getAirtable(null, "filterByFormula=" + s + "&pageSize=10").then(print_table);
+        myAirtable.getAirtable(null, "filterByFormula=" + s + "&sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D="+sort+"&pageSize=10&pageSize=10").then(print_table);
     }
 
 
@@ -147,11 +152,9 @@
         myAirtable.getAirtable(null, "pageSize=10").then(print_table);
     }
 
-    function old() {
-        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=asc&pageSize=10").then(print_table);
-    }
-    function last() {
-        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=desc&pageSize=10").then(print_table);
+    
+    function my_sort(sort){
+        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D="+sort+"&pageSize=10").then(print_table);
     }
 
     function print_table(rep) {
@@ -205,7 +208,7 @@
             } else {
                 my_next = "";
             }
-            document.getElementById('data').innerHTML = "<table>" + table_header + contenu + "</table>" + my_next;
+            document.getElementById('data').innerHTML = "<table>" + table_header + contenu + "</table>" + my_next+ "<h3>count="+rep.records.length+"</h3>";
         } else {
             document.getElementById('data').innerHTML = "<h3>NO FOUND</h3>"
         }
