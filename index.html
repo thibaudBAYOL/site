@@ -102,11 +102,11 @@ but also a drawing which evolves over time and 2 buttons to have the pdf or an i
             function hello() {
                 date = new Date();
                 salutation = document.getElementById("salutation-en");
-                if (date.getHours() <= 12) {
+                if (date.getHours()>=4 && date.getHours() <= 12) {
                     salutation.innerHTML = "Good morning";
-                }else if (date.getHours() < 17) {
+                }else if (date.getHours() > 12 && date.getHours() < 17) {
                     salutation.innerHTML = "Good afternoon";
-                } else if (date.getHours() < 21) {
+                } else if (date.getHours() >= 17 && date.getHours() < 21) {
                     salutation.innerHTML = "Good evening";
                 } else {
                     salutation.innerHTML = "Good night";
