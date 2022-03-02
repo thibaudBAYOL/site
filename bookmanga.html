@@ -37,18 +37,19 @@
 
     <div>
         <button id="add" onclick="add()">add</button>
-        <div id="f_add" hidden>
+        <form id="f_add" hidden>
             <textarea type="textarea" placeholder="titre" id="titre" required></textarea>
             <textarea type="textarea" placeholder="option" id="add_option" required></textarea>
             <textarea type="textarea" id="lien" placeholder="lien" required></textarea>
             <button onclick="b_add()">add</button>
-        </div>
+            <button type="reset">rest</button>
+        </form>
     </div>
 
     <div>
         <button id="list" onclick="list()">list</button>
         <div id="f_filter" hidden>
-            <div>
+            <form>
                 <textarea type="textarea" id="search"></textarea>
                 <select id="andor">
                     <option value="AND">AND</option>
@@ -59,7 +60,8 @@
                     <option value="asc">old</option>
                 </select>
                 <button onclick="b_search()">search</button>
-            </div>
+                <button type="reset">rest</button>
+            </form>
             <div>
                 <button onclick="f_all()">ALL</button>
                 <button onclick="one()">ONE</button>
@@ -172,7 +174,7 @@
             table_header += "</tr>";
             contenu = "";
             rep.records.forEach(element => {
-                contenu += "<tr id=" + element.id + ">";
+                contenu += "<tr title=" + element.id + " >";
 
                 contenu += "<td class=titre value='" + element.fields.Name + "'>";
                 contenu += many_title(element.fields.Name);
