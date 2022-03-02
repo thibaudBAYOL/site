@@ -174,7 +174,7 @@
             table_header += "</tr>";
             contenu = "";
             rep.records.forEach(element => {
-                contenu += "<tr title=" + element.id + " >";
+                contenu += "<tr title=" + element.id + " id=" + element.id + " >";
 
                 contenu += "<td class=titre value='" + element.fields.Name + "'>";
                 contenu += many_title(element.fields.Name);
