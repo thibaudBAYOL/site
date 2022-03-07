@@ -9,36 +9,91 @@
     <style>
         html {
             background-color: gray;
+
+        }
+
+        * {
+            font-size: large;
+        }
+
+        button {
+            /*font-size: large;*/
+            font-size: medium;
+        }
+
+        a {
+            font-size: small;
+        }
+
+
+        #data td.last_modif{
+            font-size: small;
+            min-width: 5%;
+            white-space:pre
         }
 
         table,
         td,
         th {
             border: 1px solid;
+
+        }
+        #data td{
+            font-size: x-large;
         }
 
         table {
             border-collapse: collapse;
             background-color: lightgrey;
         }
-        #co{
+
+        #f_add>textarea {
+            width: 30%;
+            font-size: x-large;
+        }
+
+        #search {
+            width: 50%;
+            font-size: x-large;
+        }
+
+
+        #co {
             background-color: rgba(255, 255, 0, 0.514);
         }
-        #f_add{
+
+        #f_add {
             background-color: pink;
         }
-        #f_filter{
+
+        #f_filter {
             background-color: rgba(0, 255, 255, 0.308);
         }
 
-        #update{
+        #update {
             background-color: rgba(128, 0, 128, 0.52);
         }
 
-        #data{
-            background-color: rgba(81, 144, 81, 0.527);
+        #update td {
+            width: 30%;
+            font-size: x-large;
         }
 
+        #update td>textarea {
+            width: 90%;
+            font-size: x-large;
+        }
+
+        #update #up_id {
+            width: 5%;
+            font-size: small;
+        }
+
+        
+
+        #data {
+            background-color: rgba(81, 144, 81, 0.527);
+        }
     </style>
 </head>
 
@@ -46,37 +101,46 @@
 <body>
     <div>
         <button id="b_deco" onclick="co_deco()" hidden>CONNECTION</button>
+        <button id="add" onclick="add()">add</button>
+        <button id="list" onclick="list()">list</button>
+    </div>
+
+    <div>
+
         <div id="co">
             <input type="text" id="login" />
             <input type="password" id="mdp" />
             <button onclick="connection()">CONNECTION</button>
+            <button onclick="co_deco()">ANNULER</button>
         </div>
     </div>
 
     <div>
-        <button id="add" onclick="add()">add</button>
-        <form id="f_add" action="#" hidden>
+
+        <form class="form" id="f_add" action="#" hidden>
             <textarea type="textarea" placeholder="titre" id="titre" required></textarea>
             <textarea type="textarea" placeholder="option" id="add_option" required></textarea>
-            <textarea type="textarea" id="lien" placeholder="lien" required></textarea>
+            <textarea type="textarea" id="lien" placeholder="url" required></textarea>
             <button onclick="b_add()">add</button>
             <button type="reset">rest</button>
         </form>
     </div>
 
     <div>
-        <button id="list" onclick="list()">list</button>
+
         <div id="f_filter" hidden>
             <form action="#">
                 <textarea type="textarea" id="search"></textarea>
+
                 <select id="andor">
                     <option value="AND">AND</option>
                     <option value="OR">OR</option>
                 </select>
                 <select id="sort">
-                    <option value="desc" selected >last</option>
+                    <option value="desc" selected>last</option>
                     <option value="asc">old</option>
                 </select>
+
                 <button onclick="b_search()">search</button>
                 <button type="reset">rest</button>
             </form>
@@ -102,7 +166,7 @@
                 <td><textarea type="textarea" placeholder="titre" id="up_titre" required></textarea>
                     <button onclick="up_titre()">M</button>
                 </td>
-                <td><textarea type="textarea" placeholder="lien" id="up_lien" required></textarea>
+                <td><textarea type="textarea" placeholder="url" id="up_lien" required></textarea>
                     <button onclick="up_lien()">M</button>
                 </td>
                 <td><textarea type="textarea" placeholder="option" id="up_option" required></textarea>
@@ -162,7 +226,7 @@
         if (tab.length > 1) {
             s = andor + "(" + s + ")";
         }
-        myAirtable.getAirtable(null, "filterByFormula=" + s + "&sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D="+sort+"&pageSize=10&pageSize=10").then(print_table);
+        myAirtable.getAirtable(null, "filterByFormula=" + s + "&sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10&pageSize=10").then(print_table);
     }
 
 
@@ -175,9 +239,9 @@
         myAirtable.getAirtable(null, "pageSize=10").then(print_table);
     }
 
-    
-    function my_sort(sort){
-        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D="+sort+"&pageSize=10").then(print_table);
+
+    function my_sort(sort) {
+        myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10").then(print_table);
     }
 
     function print_table(rep) {
@@ -187,9 +251,10 @@
 
             table_header += "<th>Name</th>";
             table_header += "<th>urls</th>";
-            table_header += "<th>Last Modified</th>";
             table_header += "<th>option</th>";
-            table_header += "<th> createdTime </th>";
+            //table_header += "<th> createdTime </th>";
+            
+            table_header += "<th>Last Modified</th>";
             table_header += "<th> update </th>";
             table_header += "<th> suprime </th>";
             table_header += "</tr>";
@@ -197,30 +262,32 @@
             rep.records.forEach(element => {
                 contenu += "<tr title=" + element.id + " id=" + element.id + " >";
 
-                contenu += "<td class=titre value='" + element.fields.Name + "'>";
+                contenu += "<td class=titre value=\"" + element.fields.Name + "\">";
                 contenu += many_title(element.fields.Name);
                 contenu += "</td>";
 
-                contenu += "<td class=lien value='" + element.fields.urls + "'>";
+                contenu += "<td class=lien value=\"" + element.fields.urls + "\">";
                 contenu += many_link(element.fields.urls);
                 contenu += "</td>";
 
-                contenu += "<td>";
-                contenu += element.fields['Last Modified'];
-                contenu += "</td>";
-                contenu += "<td  class=option value='" + element.fields.option + "'>";
+                
+                contenu += "<td  class=option value=\"" + element.fields.option + "\">";
                 contenu += element.fields.option;
                 contenu += "</td>";
+                /*
                 contenu += "<td>";
                 contenu += element.createdTime;
                 contenu += "</td>";
-
+                */
+                contenu += "<td class=\"last_modif\">";
+                contenu += element.fields['Last Modified'].replace(":",":<pre>");
+                contenu += "</td>";
                 contenu += "<td>";
                 contenu += "<button onclick=\"update('" + element.id + "')\">M</button>";
                 contenu += "</td>";
 
                 contenu += "<td>";
-                contenu += "<button onclick=\"sup('" + element.id + "','"+element.fields.Name.split("\n")[0]+"')\">M</button>";
+                contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g,"\\'") + "')\">M</button>";
                 contenu += "</td>";
 
                 contenu += "</tr>";
@@ -231,7 +298,7 @@
             } else {
                 my_next = "";
             }
-            document.getElementById('data').innerHTML = "<table>" + table_header + contenu + "</table>" + my_next+ "<h3>count="+rep.records.length+"</h3>";
+            document.getElementById('data').innerHTML = "<table>" + table_header + contenu + "</table>" + my_next + "<h3>count=" + rep.records.length + "</h3>";
         } else {
             document.getElementById('data').innerHTML = "<h3>NO FOUND</h3>"
         }
@@ -267,9 +334,9 @@
         document.getElementById("update").hidden = true;
     }
 
-    function sup(id,titre) {
+    function sup(id, titre) {
         const titre0 = titre.split("\n")[0];
-        if (confirm("Confirmé la supression de "+titre0) == true) {
+        if (confirm("Confirmé la supression de " + titre0) == true) {
             myAirtable.deleteAirtable([id]).then(log);
         }
     }
@@ -285,7 +352,7 @@
         const tab = urls.split("\n");
         var s = "";
         for (var i = 0; i < tab.length; i++) {
-            s += "<a href=" + tab[i] + " target=\"_blank\" >" + tab[i] + "</a></br>";
+            s += "*<a href=" + tab[i] + " target=\"_blank\" >" + tab[i] + "</a></br>";
         }
         return s;
     }
