@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <button onclick="hidden_date()">hidden</button>
     <input style=" height: 20; background-color: yellow;" type="number" id="interval" value="1000"
         onchange="interval = document.getElementById('interval').value; re_start();">
     <input style=" height: 20; background-color: yellow;" type="time" id="heure" value="17:00"
@@ -38,6 +39,11 @@
 <input type='button' value='Print' onclick="window.print()" />
 <div id="point" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
 <script async type="text/javascript">
+
+    function hidden_date(){
+        hidden = document.getElementById('time0').hidden;
+        document.getElementById('time0').hidden=!hidden;
+    }
 
     function getMousePosition(event) {
         var e = event || window.event;
@@ -169,7 +175,7 @@
             case 4: return "Jeudi";
             case 5: return "Vendredi";
             case 6: return "Samedi";
-            case 7: return "Dimanche";
+            case 0: return "Dimanche";
         }
     }
 
