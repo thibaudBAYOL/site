@@ -26,10 +26,10 @@
         }
 
 
-        #data td.last_modif{
+        #data td.last_modif {
             font-size: small;
             min-width: 5%;
-            white-space:pre
+            white-space: pre
         }
 
         table,
@@ -38,7 +38,8 @@
             border: 1px solid;
 
         }
-        #data td{
+
+        #data td {
             font-size: x-large;
         }
 
@@ -89,7 +90,7 @@
             font-size: small;
         }
 
-        
+
 
         #data {
             background-color: rgba(81, 144, 81, 0.527);
@@ -190,6 +191,8 @@
 
 <script>
     var myAirtable;
+    var myAirtableSpy;
+    var myapiJS;
 
     let table = "table1";
 
@@ -253,7 +256,7 @@
             table_header += "<th>urls</th>";
             table_header += "<th>option</th>";
             //table_header += "<th> createdTime </th>";
-            
+
             table_header += "<th>Last Modified</th>";
             table_header += "<th> update </th>";
             table_header += "<th> suprime </th>";
@@ -270,7 +273,7 @@
                 contenu += many_link(element.fields.urls);
                 contenu += "</td>";
 
-                
+
                 contenu += "<td  class=option value=\"" + element.fields.option + "\">";
                 contenu += element.fields.option;
                 contenu += "</td>";
@@ -280,14 +283,14 @@
                 contenu += "</td>";
                 */
                 contenu += "<td class=\"last_modif\">";
-                contenu += element.fields['Last Modified'].replace(":",":<pre>");
+                contenu += element.fields['Last Modified'].replace(":", ":<pre>");
                 contenu += "</td>";
                 contenu += "<td>";
                 contenu += "<button onclick=\"update('" + element.id + "')\">M</button>";
                 contenu += "</td>";
 
                 contenu += "<td>";
-                contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g,"\\'") + "')\">M</button>";
+                contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";
                 contenu += "</td>";
 
                 contenu += "</tr>";
@@ -383,6 +386,24 @@
 
     if ((login = localStorage.getItem("login")) != null && (mdp = localStorage.getItem("mdp")) != null) {
         myAirtable = new ApiAirtable(login, table, mdp);
+        myAirtableSpy = new ApiAirtable(login, "spy", mdp);
+        myapiJS = new ApiClient();
+        try {
+            myapiJS.get("http://ip-api.com/json/", null, true).then(function (json) {
+                ip = json.query;
+                info = "city:" + json.city + " region" + json.regionName + " org:" + json.org + " navi:" + navigator.userAgent;
+                myAirtableSpy.addAirtable([{ 'fields': { 'info': info, 'IP': ip } }]);
+            }, function (err) {
+                ip = "" + err;
+                info = " navi:" + navigator.userAgent;
+                myAirtableSpy.addAirtable([{ 'fields': { 'info': info, 'IP': ip } }]);
+            });
+        } catch (error) {
+            myAirtableSpy.addAirtable([{ 'fields': { 'info': navigator.userAgent, 'IP': "err" } }]);
+        }
+
+
+        //myAirtableSpy.addAirtable([{ 'fields': { 'info': titre, 'IP': lien} }]).then(log);
         co_deco();
     }
 
