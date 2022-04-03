@@ -15,7 +15,7 @@
 
     <button id="output" onclick="lire_txt();">PARLE</button>
 
-    <select id="voies" onclick="maj_vois();">
+    <select id="voies"  onclick="maj_vois();">
         <option value=0>PAR DEFAUT</option>
     </select>
 
@@ -28,6 +28,13 @@
         textarea = document.getElementById("text");
         choix_voies = document.getElementById("voies");
         repet = document.getElementById("repet");
+
+
+         function modif() {
+            console.log(" message "+textarea.value);
+            message=textarea.value;
+        }
+
 
         var message = "";
         
@@ -68,11 +75,14 @@
             recognition.continuous = true;
 
             recognition.onresult = function (event) {
+                textarea.innerHTML="";
+                textarea.value="";
                 for (var i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         txt = event.results[i][0].transcript;
                         textarea.value += txt;
                         message = txt;
+
                         console.log(txt);
                         step();
                     }
@@ -98,6 +108,7 @@
         } catch (err) {
             input.disabled = true
             console.log(err);
+            console.log("err");
         }
         // lire
 
@@ -105,6 +116,7 @@
         //choix_voies.add
 
         function lire_txt() {
+            modif()
             var utterance = new SpeechSynthesisUtterance(message);
             utterance.voice=list_voies[choix_voies.value];
             speechSynthesis.speak(utterance);
