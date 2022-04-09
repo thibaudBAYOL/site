@@ -2,14 +2,25 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VIDE</title>
-
+    
+    <link rel="stylesheet" href="css/w3.css">
 
     <style>
+        
         html {
             height: 100%;
-            background-image: url("./etoile.png");
+            background-image: url("./image/etoile.png");
 
+        }
+
+        a {
+            color: blue;
+        }
+
+        h1 {
+            font-family: "Times New Roman", Times, serif;
         }
 
         body {
@@ -30,12 +41,20 @@
             background-color: rgb(235, 235, 235);
 
         }
+
+        .help {
+            background-color: cyan;
+        }
+
+        
     </style>
 
 
 </head>
 
 <body>
+
+
     <div>
 
         <article id="français">
@@ -46,19 +65,62 @@
                 <ol>
                     <li title="Affiche la date et l'heure ainsi que le temps qu'il reste avant une certaine heure
 mais aussi un dessin qui evolue avec le temps et 2 boutons pour avoir le pdf ou un image du dessin."><a
-                            href="timeJS.html">TimeJS</a>: Horloge + Alarme + Dessin qui evolue dans le temps</li>
+                            href="timeJS.html">TimeJS</a>: Horloge + Alarme + Dessin qui evolue dans le temps<span class="help" onclick="show_nodel('F_TimeJS')">(?)</span>
+                    </li>
+
+
+                    <div id="F_TimeJS" class="w3-modal" hidden>
+                        <div class="w3-modal-content">
+                            <div class="w3-container">
+                                <span onclick="hidden_nodel('F_TimeJS')" class="w3-closebtn help">(&times;)</span>
+                                <p>Affiche la date et l'heure ainsi que le temps qu'il reste avant une certaine heure
+mais aussi un dessin qui évolue avec le temps et 2 boutons pour avoir le pdf ou un image du dessin.</p>
+                                    
+                            </div>
+                         </div>
+                    </div>   
+
+
 
                     <li
                         title="Avec la souris un carré jaune bouge. Si tu appuis avec la sourie cela tire des carrés rose.">
-                        <a href="fire.html">Fire</a>: jeux de tire dans le vide
+                        <a href="fire.html">Fire</a>: jeux de tire dans le vide<span class="help" onclick="show_nodel('F_Fire')">(?)</span>
                     </li>
+
+
+                    <div id="F_Fire" class="w3-modal" hidden>
+                        <div class="w3-modal-content">
+                          <div class="w3-container">
+                            <span onclick="hidden_nodel('F_Fire')" class="w3-closebtn help">(&times;)</span>
+                            <p>Avec la souris un carré jaune bouge. Si tu appuis avec la sourie cela tire des carrés rose.</p>
+                            
+                          </div>
+                        </div>
+                    </div>
+
                     <li title="COULEUR en arrière plan.
-                     Un click gauche change les couleur aléatoirment
-                     alors que le droit change les couleur progresivement.
-                     Un click du millieu donne un écran noir.
-                     Double click donne un plein-écran">
-                        <a href="color.html">Color</a>: couleur
+Un click gauche change les couleur aléatoirment 
+alors que le droit change les couleur progresivement.
+Un click du millieu donne un écran noir.
+Double click donne un plein-écran.">
+                        <a href="color.html">Color</a>: couleur<span class="help" onclick="show_nodel('F_Color')">(?)</span>
                     </li>
+
+                    <div id="F_Color" class="w3-modal" hidden>
+                        <div class="w3-modal-content">
+                          <div class="w3-container">
+                            <span onclick="hidden_nodel('F_Color')" class="w3-closebtn help">(&times;)</span>
+                            <p>COULEUR en arrière plan.
+Un click gauche change les couleur aléatoirment 
+alors que le droit change les couleur progresivement.
+Un click du millieu donne un écran noir.
+Double click donne un plein-écran.</p>
+                          </div>
+                        </div>
+                    </div>
+
+
+
                 </ol>
             </nav>
 
@@ -67,30 +129,66 @@ mais aussi un dessin qui evolue avec le temps et 2 boutons pour avoir le pdf ou 
         <article id="english" hidden>
             <!--h1>There is nothing for now</h1-->
             <h1 id="salutation-en">Hello</h1>
-            <h1> 2 pages web:</h1>
+            <h1> 2 web pages :</h1>
             <nav>
                 <ol>
                     <li title="Displays the date and time as well as the time remaining before a certain time
 but also a drawing which evolves over time and 2 buttons to have the pdf or an image of the drawing."><a
-                            href="timeJS.html">TimeJS</a>: Clock + Alarm + Drawing that evolves over time</li>
+                            href="timeJS.html">TimeJS</a>: Clock + Alarm + Drawing that evolves over time<span class="help" onclick="show_nodel('E_TimeJS')">(?)</span>
+                    </li>
+
+                    <div id="E_TimeJS" class="w3-modal" hidden>
+                        <div class="w3-modal-content">
+                            <div class="w3-container">
+                                <span onclick="hidden_nodel('E_TimeJS')" class="w3-closebtn help">(&times;)</span>
+                                <p>Displays the date and time as well as the time remaining before a certain time
+but also a drawing which evolves over time and 2 buttons to have the pdf or an image of the drawing.</p>
+                                    
+                            </div>
+                         </div>
+                    </div>
 
                     <li
                         title="With the mouse a yellow square moves. If you press with the mouse it shooting a pink squares.">
-                        <a href="fire.html">Fire</a>: shooting games in the void
+                        <a href="fire.html">Fire</a>: shooting games in the void<span class="help" onclick="show_nodel('E_Fire')">(?)</span>
                     </li>
+
+                    <div id="E_Fire" class="w3-modal" hidden>
+                        <div class="w3-modal-content">
+                            <div class="w3-container">
+                                <span onclick="hidden_nodel('E_Fire')" class="w3-closebtn help">(&times;)</span>
+                                <p>With the mouse a yellow square moves. If you press with the mouse it shooting a pink squares.</p>
+                            </div>
+                         </div>
+                    </div>
+
+
                     <li title="background COLOR.
-                    Left click exchange the color randomly.
-                    Right click exchange the color gradually.
-                    Middle click make the screen black.
-                    Double click make full screen.">
-                        <a href="color.html">Color</a>: color
+Left click exchange the color randomly.
+Right click exchange the color gradually.
+Middle click make the screen black.
+Double click make full screen.">
+                        <a href="color.html">Color</a>: color<span class="help" onclick="show_nodel('E_Color')">(?)</span>
                     </li>
+
+                    <div id="E_Color" class="w3-modal" hidden>
+                        <div class="w3-modal-content">
+                            <div class="w3-container">
+                                <span onclick="hidden_nodel('E_Color')" class="w3-closebtn help">(&times;)</span>
+                                <p>background COLOR.
+Left click exchange the color randomly.
+Right click exchange the color gradually.
+Middle click make the screen black.
+Double click make full screen.</p>
+                            </div>
+                         </div>
+                    </div>
                 </ol>
             </nav>
 
         </article>
-
     </div>
+
 
 
     <footer style="vertical-align: bottom;">
@@ -180,27 +278,27 @@ but also a drawing which evolves over time and 2 buttons to have the pdf or an i
                 day = date.getDay();
                 if (between(date, date_printemps, date_ete)) {
                     if (between(day, 20, 21)) {
-                        saisson_now = "./hiver_printemps.png";
+                        saisson_now = "./image/hiver_printemps.png";
                     } else {
-                        saisson_now = "./printemps.png";
+                        saisson_now = "./image/printemps.png";
                     }
                 } else if (between(date, date_ete, date_automne)) {
                     if (between(day, 20, 21)) {
-                        saisson_now = "./printemps_ete.png";
+                        saisson_now = "./image/printemps_ete.png";
                     } else {
-                        saisson_now = "./ete.png";
+                        saisson_now = "./image/ete.png";
                     }
                 } else if (between(date, date_automne, date_hiver)) {
                     if (between(day, 22, 23)) {
-                        saisson_now = "./ete_automne.png";
+                        saisson_now = "./image/ete_automne.png";
                     } else {
-                        saisson_now = "./automne.png";
+                        saisson_now = "./image/automne.png";
                     }
                 } else {
                     if (between(day, 21, 22)) {
-                        saisson_now = "./automne_hiver.png";
+                        saisson_now = "./image/automne_hiver.png";
                     } else {
-                        saisson_now = "./hiver.png";
+                        saisson_now = "./image/hiver.png";
                     }
                 }
 
@@ -209,22 +307,22 @@ but also a drawing which evolves over time and 2 buttons to have the pdf or an i
             }
 
             function printemps() {
-                saisson_now = "./printemps.png";
+                saisson_now = "./image/printemps.png";
                 document.getElementsByTagName("html")[0].style.backgroundImage = "url(" + saisson_now + ")";
             }
 
             function ete() {
-                saisson_now = "./ete.png";
+                saisson_now = "./image/ete.png";
                 document.getElementsByTagName("html")[0].style.backgroundImage = "url(" + saisson_now + ")";
             }
 
             function automne() {
-                saisson_now = "./automne.png";
+                saisson_now = "./image/automne.png";
                 document.getElementsByTagName("html")[0].style.backgroundImage = "url(" + saisson_now + ")";
             }
 
             function hiver() {
-                saisson_now = "./hiver.png";
+                saisson_now = "./image/hiver.png";
                 document.getElementsByTagName("html")[0].style.backgroundImage = "url(" + saisson_now + ")";
             }
 
@@ -235,6 +333,17 @@ but also a drawing which evolves over time and 2 buttons to have the pdf or an i
                 return (x >= min && x < max);
             }
 
+
+
+            //nodel
+            function show_nodel(id){
+                document.getElementById(id).style.display='block'
+            }
+
+            function hidden_nodel(id){
+                document.getElementById(id).style.display='none'
+            }
+            
 
         </script>
 
