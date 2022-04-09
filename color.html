@@ -38,28 +38,7 @@
                 elem.msRequestFullscreen();
             }
         }
-        /*
-                document.getElementsByTagName("html")[0].addEventListener('mouseup', logMouseButton);
         
-                function logMouseButton(e) {
-                if (typeof e === 'object') {
-                    switch (e.button) {
-                    case 0:
-                        console.log('Left button clicked.');
-                        break;
-                    case 1:
-                        console.log('Middle button clicked.');
-                        backgroundColor(0,0,0);
-                        break;
-                    case 2:
-                        console.log('Right button clicked.');
-                        break;
-                    default:
-                        console.log('Unknown button code: ${e.button}');
-                    }
-                }
-                }
-        */
 
 
         document.getElementsByTagName("html")[0].addEventListener('mouseup', function (e) {
@@ -92,6 +71,11 @@
             q();
             document.getElementsByTagName("body")[0].innerHTML = "<h1>" + document.getElementsByTagName("html")[0].style.backgroundColor + "</h1>";
         }
+        /**
+         * innitialise le changement de couleur.
+         * aleat:Boolean (si true on utilise un couleur aléatoir tout les 1s
+         * sinon on change la couleur tout les 100ms en changent la couleur progresivement)
+         */
         function start(aleat=true) {
 
             if (stop == true && inst == null) {
@@ -106,6 +90,10 @@
             }
         }
 
+        /**
+         * changement de couleur ON/OFF
+         * aleat : Boolean
+        */
         function if_click(aleat=true) {
             if (stop == true) {
                 start(aleat);
@@ -113,7 +101,9 @@
                 stop0();
             }
         }
-
+        /**
+         *  choix de couleur aléatoire (random)
+         */ 
         function alea() {
 
             red = Math.round(255 * Math.random());
@@ -123,7 +113,9 @@
             backgroundColor(red, green, blue);
         }
 
-
+        /**
+         *  choix de couleur qui suit un cycle.
+         */
         function boucle() {
             backgroundColor(red, green, blue);
             if ((red + stepR) >= 255 || (red + stepR) <= 0) {
@@ -139,7 +131,10 @@
             }
             red = (red + stepR) % 255;
         }
-
+        /**
+         * changer la couleur du background
+         * red , green , blue : int (0<x<255)
+         */
         function backgroundColor(red, green, blue) {
             document.getElementsByTagName("html")[0].style.backgroundColor = "rgb(" + red + "," + green + "," + blue + ")";
             if(com) console.log("rgb(" + red + "," + green + "," + blue + ")");
