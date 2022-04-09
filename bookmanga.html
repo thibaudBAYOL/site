@@ -3,8 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <title>BookManga</title>
-    <script src="apiJS.js"></script>
-    <script src="apiAirtable.js"></script>
+    <script src="js/apiJS.js"></script>
+    <script src="js/apiAirtable.js"></script>
+    <link rel="stylesheet" href="css/w3.css">
 
     <style>
         html {
@@ -20,6 +21,10 @@
             /*font-size: large;*/
             font-size: medium;
         }
+        button:checked {
+            background-color: rgb(0, 166, 255);
+        }
+         
 
         a {
             font-size: small;
@@ -53,32 +58,24 @@
             font-size: x-large;
         }
 
-        #search {
-            width: 50%;
-            font-size: x-large;
-        }
-
 
         #co {
             background-color: rgba(255, 255, 0, 0.514);
         }
 
         #f_add {
-            background-color: pink;
+            background-color: rgba(249, 10, 217, 0.605);
         }
 
         #f_filter {
-            background-color: rgba(0, 255, 255, 0.308);
+            background-color: rgba(0, 255, 255, 0.326);
         }
 
         #update {
             background-color: rgba(128, 0, 128, 0.52);
         }
 
-        #update td {
-            width: 30%;
-            font-size: x-large;
-        }
+
 
         #update td>textarea {
             width: 90%;
@@ -100,91 +97,129 @@
 
 
 <body>
-    <div>
-        <button id="b_deco" onclick="co_deco()" hidden>CONNECTION</button>
-        <button id="add" onclick="add()">add</button>
-        <button id="list" onclick="list()">list</button>
+    <div class="w3-bar w3-black">
+        <button id="b_deco" onclick="show_nodel('co')">CONNECTION</button>
+        <button id="add" onclick="show_nodel('f_add')">add</button>
+        <button id="list" onclick="show_nodel('f_filter')">list</button>
     </div>
 
     <div>
 
-        <div id="co">
-            <input type="text" id="login" />
-            <input type="password" id="mdp" />
-            <button onclick="connection()">CONNECTION</button>
-            <button onclick="co_deco()">ANNULER</button>
+        <div id="co" class="w3-modal" hidden>
+            <div class="w3-modal-content">
+                <div class="w3-container">
+                    <span onclick="hidden_nodel('co')" class="w3-button w3-bar w3-red">&times;</span>
+                    <input type="text" id="login" />
+                    <input type="password" id="mdp" />
+                    <button onclick="connection()">CONNECTION</button>
+                    <button onclick="hidden_nodel('co')">ANNULER</button>
+                </div>
+            </div>
         </div>
+
+    </div>
     </div>
 
     <div>
 
-        <form class="form" id="f_add" action="#" hidden>
-            <textarea type="textarea" placeholder="titre" id="titre" required></textarea>
-            <textarea type="textarea" placeholder="option" id="add_option" required></textarea>
-            <textarea type="textarea" id="lien" placeholder="url" required></textarea>
-            <button onclick="b_add()">add</button>
-            <button type="reset">rest</button>
-        </form>
+        <div id="f_add" class="w3-modal" hidden>
+            <div class="w3-modal-content">
+                <div class="w3-container">
+
+                    <span onclick="hidden_nodel('f_add')" class="w3-button w3-bar  w3-red">&times;</span>
+                    <div class="w3-container">
+                        <textarea  class="w3-input erasable" type="textarea" placeholder="titre" id="titre"
+                            required></textarea>
+                        <textarea class="w3-input erasable" placeholder="option" id="add_option" required></textarea>
+                        <textarea class="w3-input erasable" id="lien" placeholder="url" required></textarea>
+                        <button class="w3-bar w3-green" style="width:40%" onclick="b_add(); hidden_nodel('f_add');">add</button>
+                        <button class="w3-bar w3-yellow" style="width:40%" onclick="reset('f_add')">rest</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div>
 
-        <div id="f_filter" hidden>
-            <form action="#">
-                <textarea type="textarea" id="search"></textarea>
-
-                <select id="andor">
-                    <option value="AND">AND</option>
-                    <option value="OR">OR</option>
-                </select>
-                <select id="sort">
-                    <option value="desc" selected>last</option>
-                    <option value="asc">old</option>
-                </select>
-
-                <button onclick="b_search()">search</button>
-                <button type="reset">rest</button>
-            </form>
-            <div>
-                <button onclick="f_all()">ALL</button>
-                <button onclick="one()">ONE</button>
-                <button onclick="my_sort('desc')">last</button>
-                <button onclick="my_sort('asc')">old</button>
+        <div id="f_filter" class="w3-modal" hidden>
+            <div class="w3-modal-content">
+                <div class="w3-container">
+                    <span onclick="hidden_nodel('f_filter')" class="w3-button w3-bar  w3-red" >&times;</span>
+                    <div>
+                        <textarea class="erasable w3-bar" type="textarea" id="search"></textarea>
+                        <div>
+                            <select style="width:40%" id="andor">
+                                <option value="AND">AND</option>
+                                <option value="OR">OR</option>
+                            </select>
+                            <select style="width:40%" id="sort">
+                                <option value="desc" selected>last</option>
+                                <option value="asc">old</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button class="w3-bar w3-green" style="width:40%" onclick="b_search(); hidden_nodel('f_filter')">search</button>
+                            <button class="w3-bar w3-yellow" style="width:40%" onclick="reset('f_filter')">rest</button>
+                        </div>
+                    </div>
+                    <div>
+                        <button style="width:10%" onclick="f_all(); hidden_nodel('f_filter')">ALL</button>
+                        <button style="width:10%" onclick="one(); hidden_nodel('f_filter')">ONE</button>
+                        <button style="width:10%" onclick="my_sort('desc'); hidden_nodel('f_filter')">last</button>
+                        <button style="width:10%" onclick="my_sort('asc'); hidden_nodel('f_filter')">old</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="update" hidden>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>urls</th>
-                <th>option</th>
-            </tr>
-            <tr>
-                <td id="up_id">ID</td>
-                <td><textarea type="textarea" placeholder="titre" id="up_titre" required></textarea>
-                    <button onclick="up_titre()">M</button>
-                </td>
-                <td><textarea type="textarea" placeholder="url" id="up_lien" required></textarea>
-                    <button onclick="up_lien()">M</button>
-                </td>
-                <td><textarea type="textarea" placeholder="option" id="up_option" required></textarea>
-                    <button onclick="up_option()">M</button>
-                </td>
-            </tr>
-        </table>
-        <button onclick="up_stop()">stop Update</button>
+    <div id="update" class="w3-modal" hidden>
+        <div class="w3-modal-content">
+            <div class="w3-container">
+                <span onclick="hidden_nodel('update')" class="w3-button w3-bar w3-red">&times;</span>
+
+
+                <div class="w3-container">
+
+                    <label>ID</label>
+                    <div id="up_id">ID</div>
+
+                    <label>Name</label>
+                    <div><textarea class="w3-input" type="textarea" placeholder="titre" id="up_titre"
+                            required></textarea>
+                        <button class="w3-bar w3-green" onclick="up_titre()">M</button>
+                    </div>
+                    <label>urls</label>
+                    <div><textarea class="w3-input" type="textarea" placeholder="url" id="up_lien" required></textarea>
+                        <button class="w3-bar w3-green" onclick="up_lien()">M</button>
+                    </div>
+
+                    <label>option</label>
+                    <div><textarea class="w3-input" type="textarea" placeholder="option" id="up_option"
+                            required></textarea>
+                        <button class="w3-bar w3-green" onclick="up_option()">M</button>
+                    </div>
+
+
+
+                </div>
+
+                <button onclick="hidden_nodel('update')">stop Update</button>
+            </div>
+        </div>
+    </div>
     </div>
 
+    <div id="info">
+
+    </div>
 
     <div id="data">
 
     </div>
-    <div id="info">
-
-    </div>
+    
 
 
 </body>
@@ -199,14 +234,7 @@
     var update_id = undefined;
     var confirm_sup = false;
 
-    function list() {
-        list0 = document.getElementById("f_filter");
-        list0.hidden = !list0.hidden;
-    }
-    function add() {
-        add0 = document.getElementById("f_add");
-        add0.hidden = !add0.hidden;
-    }
+
 
     function b_add() {
         //titre // add_option // lien
@@ -310,7 +338,7 @@
     function update(id) {
         update_id = id;
         document.getElementById("up_id").innerHTML = id;
-        document.getElementById("update").hidden = false;
+        show_nodel("update")
         titre = document.getElementById(id).getElementsByClassName("titre")[0].attributes[1].value;
         document.getElementById("up_titre").value = titre;
         lien = document.getElementById(id).getElementsByClassName("lien")[0].attributes[1].value;
@@ -369,42 +397,40 @@
     }
 
 
-    function co_deco() {
-        co = document.getElementById("co");
-        co.hidden = !co.hidden;
-        b = document.getElementById("b_deco");
-        b.hidden = !b.hidden;
-    }
+
     function connection() {
         login = document.getElementById("login").value;
         mdp = document.getElementById("mdp").value;
         myAirtable = new ApiAirtable(login, table, mdp);
         localStorage.setItem("login", login);
         localStorage.setItem("mdp", mdp);
-        co_deco();
+        hidden_nodel("co");
     }
 
     if ((login = localStorage.getItem("login")) != null && (mdp = localStorage.getItem("mdp")) != null) {
         myAirtable = new ApiAirtable(login, table, mdp);
         myAirtableSpy = new ApiAirtable(login, "spy", mdp);
         myapiJS = new ApiClient();
-        try {
-            myapiJS.get("http://ip-api.com/json/", null, true).then(function (json) {
-                ip = json.query;
-                info = "city:" + json.city + " region" + json.regionName + " org:" + json.org + " navi:" + navigator.userAgent;
-                myAirtableSpy.addAirtable([{ 'fields': { 'info': info, 'IP': ip } }]);
-            }, function (err) {
-                ip = "" + err;
-                info = " navi:" + navigator.userAgent;
-                myAirtableSpy.addAirtable([{ 'fields': { 'info': info, 'IP': ip } }]);
-            });
-        } catch (error) {
-            myAirtableSpy.addAirtable([{ 'fields': { 'info': navigator.userAgent, 'IP': "err" } }]);
-        }
-
+        /* try {
+             
+             myapiJS.get("http://ip-api.com/json/", null, true).then(function (json) {
+                 ip = json.query;
+                 info = "city:" + json.city + " region" + json.regionName + " org:" + json.org + " navi:" + navigator.userAgent;
+                 myAirtableSpy.addAirtable([{ 'fields': { 'info': info, 'IP': ip } }]);
+             }, function (err) {
+                 ip = "" + err;
+                 info = " navi:" + navigator.userAgent;
+                 myAirtableSpy.addAirtable([{ 'fields': { 'info': info, 'IP': ip } }]);
+             });
+             
+         } catch (error) {
+             myAirtableSpy.addAirtable([{ 'fields': { 'info': "navi:"+navigator.userAgent, 'IP': "err" } }]);
+         }
+         */
+        myAirtableSpy.addAirtable([{ 'fields': { 'info': "navi:"+navigator.userAgent, 'IP': "vide" } }]);
 
         //myAirtableSpy.addAirtable([{ 'fields': { 'info': titre, 'IP': lien} }]).then(log);
-        co_deco();
+        hidden_nodel("co");
     }
 
     //bookmanga.html
@@ -415,6 +441,21 @@
     //localStorage.setItem("lastname", "Smith");
     //localStorage.getItem("lastname");
 
+    //nodel
+    function show_nodel(id) {
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function hidden_nodel(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function reset(id) {
+        var list = document.getElementById(id).getElementsByClassName("erasable");;
+        for (i = 0; i < list.length; i++) {
+            list[i].value = "";
+        }
+    }
 
 
 </script>
