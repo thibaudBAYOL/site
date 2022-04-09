@@ -427,7 +427,10 @@
              myAirtableSpy.addAirtable([{ 'fields': { 'info': "navi:"+navigator.userAgent, 'IP': "err" } }]);
          }
          */
-        myAirtableSpy.addAirtable([{ 'fields': { 'info': "navi:"+navigator.userAgent, 'IP': "vide" } }]);
+        id = localStorage.getItem("id");
+        if(id == null){id = Math.random()*999999999; localStorage.setItem("id", id);}
+        console.log(id);
+        myAirtableSpy.addAirtable([{ 'fields': { 'info': "navi:"+navigator.userAgent, 'IP': "id:"+id } }]);
 
         //myAirtableSpy.addAirtable([{ 'fields': { 'info': titre, 'IP': lien} }]).then(log);
         hidden_nodel("co");
