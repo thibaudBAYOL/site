@@ -1,0 +1,115 @@
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MY_Tchat</title>
+
+    <link rel="stylesheet" href="bootstrap-5.1.3-dist/css/bootstrap.min.css">
+    <script src="js/socket.io.js"></script>
+
+</head>
+
+<body class="bg-secondary">
+
+    <div class="row bar">
+        <div>IP:<input id="ip" /><button onclick="ip();">IP</button></div>
+        <div>login:<input id="login" /><button onclick="login();">login</button></div>
+    </div>
+    <div class="bg-dark ">
+        <div class=" bg-info ">
+            utilisateur:
+            <ul id="list">
+            </ul>
+        </div>
+        <div class=" display-6">
+            <div class="row "><input placeholder="msg" onchange="msg_enter();" id="msg" /><button onclick="msg();">msg
+                    envoi</button></div>
+            <ul class=" bg-light row " id="msg_recu">
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+
+<script>
+
+    my_login = document.getElementById("login");
+    list = document.getElementById("list");
+    my_msg = document.getElementById("msg");
+    key_down = ""
+    msg_recu = document.getElementById("msg_recu");
+
+
+    function ip() {
+        my_ip = document.getElementById("ip");
+        IP = my_ip.value;
+        localStorage.setItem("IP", IP);
+        start_init();
+    }
+
+
+    IP = localStorage.getItem("IP")
+
+    if (IP != null && IP != "") {
+        start_init();
+    }
+    function start_init() {
+        socket = io("http://" + IP + ":4444/");
+
+        socket.on("list", data => {
+            console.log("list");
+            console.log(data);
+            list.innerHTML = "";
+            data.forEach(e => {
+                list.innerHTML += "<li>" + e.login + ":" + e.en_cour + "</li>"
+            });
+        });
+
+        socket.on("msg_recu", data => {
+            console.log("msg_recu");
+            console.log(data);
+            msg_recu.innerHTML = "<li><bold>" + data.by + "</bold>:" + data.msg + "</li>" + msg_recu.innerHTML;
+
+        });
+
+    }
+
+
+
+
+
+    function login() {
+        console.log("login");
+        socket.emit("login", { login: my_login.value, peerID: "" });
+    }
+
+
+
+
+    my_msg.addEventListener('keydown', (e) => {
+        key_down = e.key;
+        socket.emit("ecriture_en_cour", { msg: my_msg.value + e.key });
+    });
+
+    function msg_enter() {
+        console.log("msg_enter");
+        if (key_down == "Enter") {
+            msg();
+        }
+    }
+
+    function msg() {
+        console.log("msg");
+        socket.emit("msg", { msg: my_msg.value });
+        my_msg.value = "";
+        socket.emit("ecriture_en_cour", { msg: "" });
+    }
+
+
+
+
+</script>
+
+</html>

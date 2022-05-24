@@ -1,0 +1,243 @@
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MY_RTC</title>
+
+    <link rel="stylesheet" href="bootstrap-5.1.3-dist/css/bootstrap.min.css">
+    <script src="js/peerjs.min.js"></script>
+    <script src="js/socket.io.js"></script>
+
+</head>
+
+<body class="bg-secondary">
+
+    <div class="col-md-11  row w3-bar w3-black">
+        <h2 class="col-md-3" id="peer_id"></h2>
+        <!--button onclick="start();">start</button>
+        <input id="remote_peer_id" />
+        <button onclick="callto(remote_peer_id.value);">start</button-->
+        <div class="col-md-3">IP:<input id="ip" /><button onclick="ip();">IP</button></div>
+        <div class="col-md-3">login:<input id="login" /><button onclick="login();">login</button></div>
+        <button class="col-md-3" onclick="toggleFullScreen();">FULL SCREEN F11</button>
+    </div>
+
+
+    <!--video id="localVideo" autoplay></video-->
+    <div class="col-md-11 bg-info ">
+        utilisateur:
+        <ul id="list">
+        </ul>
+    </div>
+    <div class="col-md-12 row bg-dark ">
+        
+        <video class="col-md-6" id="remoteVideo" autoplay></video>
+        <div class="col-md-4 display-6">
+            <div class="row "><input placeholder="msg" onchange="msg_enter();" id="msg" /><button onclick="msg();">msg
+                    envoi</button></div>
+            <ul class=" bg-light row " id="msg_recu">
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+
+<script>
+    
+    function ip() {
+        my_ip = document.getElementById("ip");
+        IP = my_ip.value;
+        localStorage.setItem("IP", IP);
+        start_init();
+    }
+
+
+    IP = localStorage.getItem("IP")
+
+    if ( IP != null && IP != "") {
+        start_init();
+    }
+
+    function start_init() {
+        console.log("start_init=" + IP)
+        constraints = { audio: true, video: true };
+
+        my_peers_id = Math.random().toString(36).replace(/[^a-z]+/g, '');
+        console.log(my_peers_id);
+
+        document.getElementById("peer_id").innerHTML = my_peers_id;
+
+        //PEERJS
+        //peerjs --port 9000 --key peerjs --path /
+        peer = new Peer(my_peers_id, {
+            host: IP,
+            port: 9000,
+            path: '/'
+        });
+
+        peer.on('open', function (id) {
+            my_peers_id = id;
+            console.log('My peer ID is: ' + id);
+        });
+
+
+        /// quelqu'un nous a lancer un appel (call).
+        peer.on('call', async function (call) {
+            console.log("call reçu by peerID:" + call.peer);
+
+
+            // affichage de sa propre video
+            try {
+
+                //if (stream_local == undefined) start();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                // envoyer sont flux video en reponce.
+                console.log("reponce avec localstream envoyé");
+                call.answer(stream); // Answer the call with an A/V stream.
+
+            } catch (e) {
+                console.log(` error: ${e} ${e.name}`);
+            }
+
+            // recevoir le stream video etranger.
+            call.on('stream', function (remoteStream) {
+
+                console.log("Received remote stream " + call.peer);
+                remoteVideo.srcObject = remoteStream;
+
+            });
+
+        });
+
+
+        // SOCKET
+        socket = io("http://" + IP + ":4444/");
+
+        socket.on("list", data => {
+            console.log("list");
+            console.log(data);
+            list.innerHTML = "";
+            data.forEach(e => {
+                list.innerHTML += "<li onclick='callto(\"" + e.peerID + "\")'>" + e.login + ":" + e.en_cour + "</li>"
+            });
+        });
+
+        socket.on("msg_recu", data => {
+            console.log("msg");
+            console.log(data);
+            msg_recu.innerHTML = "<li><bold>" + data.by + "</bold>:" + data.msg + "</li>" + msg_recu.innerHTML;
+
+        });
+
+        start();
+    }
+
+    my_login = document.getElementById("login");
+    list = document.getElementById("list");
+    my_msg = document.getElementById("msg");
+    key_down = ""
+    msg_recu = document.getElementById("msg_recu");
+
+
+
+
+    function login() {
+        console.log("login");
+        socket.emit("login", { login: my_login.value, peerID: my_peers_id });
+    }
+
+
+    my_msg.addEventListener('keydown', (e) => {
+        key_down = e.key;
+        socket.emit("ecriture_en_cour", { msg: my_msg.value + e.key });
+    });
+
+    function msg_enter() {
+        console.log("msg_enter");
+        if (key_down == "Enter") {
+            msg();
+        }
+    }
+
+    function msg() {
+        console.log("msg");
+        socket.emit("msg", { msg: my_msg.value });
+        my_msg.value = "";
+        socket.emit("ecriture_en_cour", { msg: "" });
+    }
+
+    stream_local = undefined
+
+    //localVideo = document.getElementById("localVideo");
+    remoteVideo = document.getElementById("remoteVideo");
+    remote_peer_id = document.getElementById("remote_peer_id");
+
+    document.addEventListener("keydown", function (e) {
+        if (e.keyCode == 33) {
+            toggleFullScreen();
+        }
+    }, false);
+
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            remoteVideo.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+
+
+    // affichage de sa propre video
+    function start() {
+        console.log('Received local stream');
+        try {
+            stream_local = navigator.mediaDevices.getUserMedia(this.constraints);
+            /*
+            stream_local.then(mediaStream => {
+                localVideo.srcObject = mediaStream;
+                localVideo.muted = true;
+            });
+            */
+        } catch (e) {
+            alert(`getUserMedia() error: ${e.name}`);
+        }
+    }
+
+
+
+
+    // lancer un appele(call) pour another_peers_id
+    function callto(peers_id) {
+        console.log("call début");
+        // affichage de sa propre video
+
+        if (this.stream_local == undefined) start();
+
+        stream_local.then(mediaStream => {
+            console.log("call avec local stream envoyé");
+            var call = this.peer.call(peers_id, mediaStream);
+            // recevoir le stream video etranger.
+            call.on('stream', function (remoteStream) {
+                console.log("Received remote stream");
+                console.log(this.remoteVideo);
+                remoteVideo.srcObject = remoteStream;
+
+
+            });
+        }).catch(err => {
+            console.log(".catch(err=>" + err);
+        });
+
+    }
+
+
+
+</script>
+
+</html>
