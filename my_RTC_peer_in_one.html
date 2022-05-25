@@ -107,13 +107,17 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
 <body class="bg-secondary">
 
     <div class="col-md-11  row w3-bar w3-black">
-        <h2 class="col-md-3" id="peer_id"></h2>
+        <h2 class="col-md-2" id="peer_id"></h2>
         <!--button onclick="start();">start</button>
         <input id="remote_peer_id" />
         <button onclick="callto(remote_peer_id.value);">start</button-->
         <div class="col-md-3">IP:<input id="ip" /><button onclick="ip();">IP</button></div>
         <div class="col-md-3">login:<input id="login" /><button onclick="login();">login</button></div>
-        <button class="col-md-3" onclick="toggleFullScreen();">FULL SCREEN F11</button>
+        <button class="col-md-2" onclick="toggleFullScreen();">FULL SCREEN F11</button>
+        <select class="col-md-1"onchange="update();" id="choix">
+            <option value=0 selected>Caméra</option>
+            <option value=1 >Ecran</option>
+        </select>
     </div>
 
 
@@ -133,11 +137,14 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
             </ul>
         </div>
     </div>
+    <video class="col-md-1" id="localVideo" autoplay></video>
+    
 
 </body>
 
 
 <script>
+    ecran = false;
     
     function ip() {
         my_ip = document.getElementById("ip");
@@ -146,6 +153,11 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
         start_init();
     }
 
+    choix = document.getElementById("choix");
+    function update(){
+        ecran = (choix.value == 1);
+        start();
+    }
 
     IP = localStorage.getItem("IP")
 
@@ -154,6 +166,7 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
     }
 
     function start_init() {
+        
         console.log("start_init=" + IP)
         constraints = { audio: true, video: true };
 
@@ -263,7 +276,7 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
 
     stream_local = undefined
 
-    //localVideo = document.getElementById("localVideo");
+    localVideo = document.getElementById("localVideo");
     remoteVideo = document.getElementById("remoteVideo");
     remote_peer_id = document.getElementById("remote_peer_id");
 
@@ -290,13 +303,18 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
     function start() {
         console.log('Received local stream');
         try {
-            stream_local = navigator.mediaDevices.getUserMedia(this.constraints);
-            /*
+            
+            if (ecran) {
+                stream_local = navigator.mediaDevices.getDisplayMedia(this.constraints);
+            } else {
+                stream_local = navigator.mediaDevices.getUserMedia(this.constraints);
+            }
+            
             stream_local.then(mediaStream => {
                 localVideo.srcObject = mediaStream;
                 localVideo.muted = true;
             });
-            */
+            
         } catch (e) {
             alert(`getUserMedia() error: ${e.name}`);
         }
