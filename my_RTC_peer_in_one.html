@@ -130,6 +130,7 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
     <div class="col-md-12 row bg-dark ">
         
         <video class="col-md-6" id="remoteVideo" autoplay></video>
+
         <div class="col-md-4 display-6">
             <div class="row "><input placeholder="msg" onchange="msg_enter();" id="msg" /><button onclick="msg();">msg
                     envoi</button></div>
@@ -138,13 +139,17 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
         </div>
     </div>
     <video class="col-md-1" id="localVideo" autoplay></video>
-    
+    <video class="col-md-1" id="ecranVideo" autoplay></video>
+    <div id="boxVideo">
+
+    </div>
 
 </body>
 
 
 <script>
     ecran = false;
+    id_video = 0;
     
     function ip() {
         my_ip = document.getElementById("ip");
@@ -206,13 +211,21 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
             } catch (e) {
                 console.log(` error: ${e} ${e.name}`);
             }
-
+            counteur=0;
             // recevoir le stream video etranger.
             call.on('stream', function (remoteStream) {
-
+                if(counteur==0){
+                    counteur=1
                 console.log("Received remote stream " + call.peer);
                 remoteVideo.srcObject = remoteStream;
 
+                const videobis = document.createElement("video");
+                videobis.id="video"+id_video;
+                videobis.autoplay=true;
+                boxVideo.appendChild(videobis);
+                document.getElementById("video"+id_video).srcObject = remoteStream;
+                id_video ++;
+                }
             });
 
         });
@@ -226,7 +239,7 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
             console.log(data);
             list.innerHTML = "";
             data.forEach(e => {
-                list.innerHTML += "<li onclick='callto(\"" + e.peerID + "\")'>" + e.login + ":" + e.en_cour + "</li>"
+                list.innerHTML += "<li onclick='callto(\"" + e.peerID + "\")'>--" + e.login + ":" + e.en_cour + "</li>"
             });
         });
 
@@ -278,6 +291,8 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
 
     localVideo = document.getElementById("localVideo");
     remoteVideo = document.getElementById("remoteVideo");
+    ecranVideo = document.getElementById("ecranVideo");
+    boxVideo = document.getElementById("boxVideo");
     remote_peer_id = document.getElementById("remote_peer_id");
 
     document.addEventListener("keydown", function (e) {
@@ -306,14 +321,19 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
             
             if (ecran) {
                 stream_local = navigator.mediaDevices.getDisplayMedia(this.constraints);
+                stream_local.then(mediaStream => {
+                ecranVideo.srcObject = mediaStream;
+                ecranVideo.muted = true;
+            });
             } else {
                 stream_local = navigator.mediaDevices.getUserMedia(this.constraints);
-            }
-            
-            stream_local.then(mediaStream => {
+                stream_local.then(mediaStream => {
                 localVideo.srcObject = mediaStream;
                 localVideo.muted = true;
             });
+            }
+            
+            
             
         } catch (e) {
             alert(`getUserMedia() error: ${e.name}`);
@@ -335,7 +355,7 @@ p||(p=u?443:80),r=e.hostname!==location.hostname||p!==e.port,a=e.secure!==u}if(e
             var call = this.peer.call(peers_id, mediaStream);
             // recevoir le stream video etranger.
             call.on('stream', function (remoteStream) {
-                console.log("Received remote stream");
+                console.log("Received remote stream call to");
                 console.log(this.remoteVideo);
                 remoteVideo.srcObject = remoteStream;
 
