@@ -101,6 +101,9 @@
         <button id="b_deco" onclick="show_nodel('co')">CONNECTION</button>
         <button id="add" onclick="show_nodel('f_add')">add</button>
         <button id="list" onclick="show_nodel('f_filter')">list</button>
+        <select id="key_word_next" hidden>
+            <option></option>
+        </select>
     </div>
 
     <div>
@@ -202,7 +205,7 @@
                         <button class="w3-bar w3-green" onclick="up_option()">M</button>
                     </div>
 
-
+                    <input id="search_button_input" placeholder="search_button"/>
 
                 </div>
 
@@ -210,6 +213,8 @@
             </div>
         </div>
     </div>
+
+
     </div>
 
     <div id="info">
@@ -234,7 +239,7 @@
     var update_id = undefined;
     var confirm_sup = false;
 
-
+    var map_key_word_next = new Map;
 
     function b_add() {
         //titre // add_option // lien
@@ -320,7 +325,7 @@
                 contenu += "<td>";
                 contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";
                 contenu += "</td>";
-
+                contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button</td>";
                 contenu += "</tr>";
 
             });
@@ -387,6 +392,70 @@
         }
         return s;
     }
+
+    function search_button(id){
+        
+        // http://localhost:1234/?updateone="+ +"&word="++";
+        const tab = document.getElementById(id).getElementsByClassName("lien")[0].getElementsByTagName("a")
+        var s = "";
+        document.getElementById(id).getElementsByClassName("retour")[0].innerHTML ="";
+
+        const regex = /\/\/([^\/]*)\//;
+
+        for( i=0; i<tab.length;i++){
+        
+        url = "";
+        url = tab[i].href;
+        
+        word = document.getElementById("search_button_input").value;
+        if(word == ""){
+            
+            if ((m = regex.exec(url)) !== null) {
+                m.forEach((match, groupIndex) => {
+                    if(groupIndex=1){
+                    word = map_key_word_next.get(match);
+                    }
+                });
+            }
+
+        }
+        console.log(word+ " "+ url);
+        if(word != undefined){
+            console.log("http://localhost:1234/?updateone="+url+"&word="+word);
+            myapiJS.get("http://localhost:1234/?updateone="+url+"&word="+word).then(function(text){
+                s="";
+                url  = "";
+                regex2 = /Lien \[([^\}]*)\]/;
+                if ((m = regex2.exec(text)) !== null) {
+                m.forEach((match, groupIndex) => {
+                    if(groupIndex=1){
+                        url = match;
+                    }
+                });
+                }
+                
+                if(text.match(/red/)){
+                    s= "<p class='w3-red'>NON =" + url + "</p>";
+                }else if(text.match(/green/)){
+                    s= "<p class='w3-green'>OUI =" + url + "</p>";
+                }else{
+                    s= text
+                }
+
+            document.getElementById(id).getElementsByClassName("retour")[0].innerHTML +=s;
+            },function(err){
+                s="<p class='w3-blue'>err:"+err+"</p>";
+            document.getElementById(id).getElementsByClassName("retour")[0].innerHTML +=s;
+            })
+        }else{
+            document.getElementById(id).getElementsByClassName("retour")[0].innerHTML +="<p>Pas de mot de recherche "+url+"</p>";
+        }
+
+    }
+
+    }
+
+
     function many_title(titles) {
         const tab = titles.split("\n");
         var s = "";
@@ -410,6 +479,7 @@
     if ((login = localStorage.getItem("login")) != null && (mdp = localStorage.getItem("mdp")) != null) {
         myAirtable = new ApiAirtable(login, table, mdp);
         myAirtableSpy = new ApiAirtable(login, "spy", mdp);
+        myAirtablekey = new ApiAirtable(login, "site_key", mdp);
         myapiJS = new ApiClient();
         /* try {
              
@@ -433,6 +503,26 @@
         myAirtableSpy.addAirtable([{ 'fields': { 'info': "navi:"+navigator.userAgent, 'IP': "id:"+id } }]);
 
         //myAirtableSpy.addAirtable([{ 'fields': { 'info': titre, 'IP': lien} }]).then(log);
+
+
+        myAirtablekey.getAirtable(null,"").then(function(rep){
+            key_word_next = document.getElementById("key_word_next");
+            //key_word_next.innerHTML="";
+            rep.records.forEach(element => {
+
+                map_key_word_next.set(element.fields.site,element.fields.key);
+
+                var option = document.createElement("option");
+                option.text = "<" + element.fields.site + "> => <" + element.fields.key + ">";
+                option.id = element.fields.site;
+                option.value = element.fields.key;
+                key_word_next.appendChild(option);
+
+
+            });
+        });
+
+
         hidden_nodel("co");
     }
 
