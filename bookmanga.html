@@ -293,6 +293,8 @@
             table_header += "<th>Last Modified</th>";
             table_header += "<th> update </th>";
             table_header += "<th> suprime </th>";
+            table_header += "<th> <button onclick=\"All_search_button()\">S_ALL</button> </th>";
+            //
             table_header += "</tr>";
             contenu = "";
             rep.records.forEach(element => {
@@ -325,7 +327,7 @@
                 contenu += "<td>";
                 contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";
                 contenu += "</td>";
-                contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button</td>";
+                contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button></td>";
                 contenu += "</tr>";
 
             });
@@ -453,6 +455,15 @@
 
     }
 
+    }
+
+    function All_search_button(){
+    
+        list = document.getElementById("data").getElementsByTagName("tr")
+        for (let index = 1; index < list.length; index++) {
+            const element = list[index].id;
+            search_button(element);
+        }
     }
 
 
