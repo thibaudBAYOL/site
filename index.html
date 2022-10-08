@@ -60,7 +60,7 @@
         <article id="français">
             <!--h1>Il n'y a rien pour l'instant</h1-->
             <h1 id="salutation-fr">Bonjour</h1>
-            <h1> 3 pages web:</h1>
+            <h1> 4 pages web:</h1>
             <nav>
                 <ol>
                     <li title="Affiche la date et l'heure ainsi que le temps qu'il reste avant une certaine heure
@@ -119,7 +119,22 @@ Double click donne un plein-écran.</p>
                         </div>
                     </div>
 
+                    <li
+                    title="lire un text avec une vois synthetique + traduire la voie en text (GoogleChrome)">
+                    <a href="ecoute_parle.html">ecoute & parle</a>: lire text + traduire voie en text<span class="help" onclick="show_nodel('F_E')">(?)</span>
+                    </li>
 
+
+                <div id="F_E" class="w3-modal" hidden>
+                    <div class="w3-modal-content">
+                      <div class="w3-container">
+                        <span onclick="hidden_nodel('F_E')" class="w3-closebtn help">(&times;)</span>
+                        <p>Bouton "ECOUTE" pour traduire la voie en text.</p>
+                        <p>Bouton "PARLE" pour lire un text avec une vois synthetique.</p>
+                        <p>Bouton "REPETE" pour répèté ce qui est dit.</p>
+                      </div>
+                    </div>
+                </div>
 
                 </ol>
             </nav>
@@ -129,7 +144,7 @@ Double click donne un plein-écran.</p>
         <article id="english" hidden>
             <!--h1>There is nothing for now</h1-->
             <h1 id="salutation-en">Hello</h1>
-            <h1> 2 web pages :</h1>
+            <h1> 3 web pages :</h1>
             <nav>
                 <ol>
                     <li title="Displays the date and time as well as the time remaining before a certain time
@@ -203,7 +218,8 @@ Double click make full screen.</p>
         <script>
 
             saisson();
-
+            hello();
+            Bonjour();
 
             function hello() {
                 date = new Date();
@@ -222,9 +238,9 @@ Double click make full screen.</p>
             function Bonjour() {
                 date = new Date();
                 salutation = document.getElementById("salutation-fr");
-                if (date.getHours() < 17) {
+                if (date.getHours() >= 4 && date.getHours() < 17) {
                     salutation.innerHTML = "Bonjour";
-                } else if (date.getHours() < 21) {
+                } else if (date.getHours() >= 17 && date.getHours() < 21) {
                     salutation.innerHTML = "Bonsoir";
                 } else {
                     salutation.innerHTML = "Bonne nuit";
