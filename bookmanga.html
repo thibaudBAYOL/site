@@ -101,7 +101,7 @@
         <button id="b_deco" onclick="show_nodel('co')">CONNECTION</button>
         <button id="add" onclick="show_nodel('f_add')">add</button>
         <button id="list" onclick="show_nodel('f_filter')">list</button>
-        <select id="key_word_next" hidden>
+        <select id="key_word_next" >
             <option></option>
         </select>
     </div>
@@ -113,6 +113,11 @@
                 <div class="w3-container">
                     <span onclick="hidden_nodel('co')" class="w3-button w3-bar w3-red">&times;</span>
                     <input type="text" id="login" />
+                    <select id="log" onclick="move_log()">
+                        <option value="appx6X604pwo3AyKs" selected>testV2</option>
+                        <option value="appY5cp94QUoFgKvI">testV2Plus0</option>
+                        <option value="app4IapjlBZY9JZA4">testV2Plus1</option>
+                    </select>
                     <input type="password" id="mdp" />
                     <button onclick="connection()">CONNECTION</button>
                     <button onclick="hidden_nodel('co')">ANNULER</button>
@@ -318,7 +323,13 @@
                 contenu += "</td>";
                 */
                 contenu += "<td class=\"last_modif\">";
-                contenu += element.fields['Last Modified'].replace(":", ":<pre>");
+                    
+                if( element.fields['Last Modified'] === undefined) {
+                    contenu += "";
+                } else  {
+                    contenu += element.fields['Last Modified'].replace(":", ":<pre>");
+                }
+                
                 contenu += "</td>";
                 contenu += "<td>";
                 contenu += "<button onclick=\"update('" + element.id + "')\">M</button>";
@@ -437,6 +448,23 @@
                 }
                 
                 if(text.match(/red/)){
+                    myapiJS.get("http://localhost:1234/?updateone="+url+"&word=body").then(function(text){
+                        if(text.match(/red/)){
+                            
+                            regex2 = /Lien \[([^\}]*)\]/;
+                            if ((m = regex2.exec(text)) !== null) {
+                            m.forEach((match, groupIndex) => {
+                                if(groupIndex=1){
+                                    url = match;
+                                }
+                            });
+                            }
+                            document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-pink'>VIDE =" + url + "</p>";
+                        }
+                        
+                    },function(err){
+                        document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-blue'>err:"+err+"</p>";
+                    });
                     s= "<p class='w3-red'>NON =" + url + "</p>";
                 }else if(text.match(/green/)){
                     s= "<p class='w3-green'>OUI =" + url + "</p>";
@@ -476,18 +504,58 @@
         return s;
     }
 
+    var date = new Date();
+        date.setDate(date.getDate() + 365);
+        date = date.toUTCString();
+        console.log(date);
 
+    function setCookie() {
+            console.log("setCookie()");
+            //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
+            
+            json = { "login": document.getElementById("login").value , "mdp": document.getElementById("mdp").value };
+        
+            let co = "myCookie=" + JSON.stringify(json) + "; expires=" + date + " ; samesite=strict";
+            console.log("setCookie:" + co)
+            document.cookie = co;
+    }
 
     function connection() {
         login = document.getElementById("login").value;
         mdp = document.getElementById("mdp").value;
         myAirtable = new ApiAirtable(login, table, mdp);
-        localStorage.setItem("login", login);
-        localStorage.setItem("mdp", mdp);
+        setCookie();
         hidden_nodel("co");
     }
 
     if ((login = localStorage.getItem("login")) != null && (mdp = localStorage.getItem("mdp")) != null) {
+        document.getElementById("login").value = login;
+        document.getElementById("mdp").value = mdp;
+        
+        localStorage.removeItem("login");
+        localStorage.removeItem("mdp");
+    }
+
+    // lire le cookie (login mdp)
+    if (!document.cookie.includes("myCookie=")) {
+            console.log("ADD " + document.cookie);
+            setCookie();
+    } else {
+            console.log("document.cookie lercture");
+            tab_cookies = document.cookie.split(";");
+            tab_cookies.forEach(element => {
+                if (element.startsWith("myCookie=")) {
+                    json = JSON.parse(element.replace("myCookie=", ""));
+                    document.getElementById("login").value = json.login;
+                    document.getElementById("mdp").value = json.mdp;
+                }
+            });
+    }
+
+
+
+    if ((login = document.getElementById("login").value) != null && (mdp = document.getElementById("mdp").value) != null) {
+        setCookie();
         myAirtable = new ApiAirtable(login, table, mdp);
         myAirtableSpy = new ApiAirtable(login, "spy", mdp);
         myAirtablekey = new ApiAirtable(login, "site_key", mdp);
@@ -560,6 +628,12 @@
             list[i].value = "";
         }
     }
+
+    function move_log(){
+        document.getElementById("login").value = document.getElementById("log").value;
+    }
+
+    
 
 
 </script>
