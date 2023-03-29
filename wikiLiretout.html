@@ -37,7 +37,7 @@
             //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
             title = title.replace(/ /g, "");
             json = { "id": idactuel, "title": title };
-            let co = "myCookie=" + JSON.stringify(json) + "; expires=" + date + ' ; samesite=strict';
+            let co = "myCookieWikiLiretout=" + JSON.stringify(json) + "; expires=" + date + ' ; samesite=strict';
             console.log("setCookie:" + co)
             document.cookie = co;
         }
@@ -97,7 +97,8 @@
 
 
                 var api = new ApiClient();
-                url = "https://www.isekailunatic.com/2022/03/28/tsuki-chapter-461-intermission-daily-life-double-face-bottom/";
+                url = "https://isekailunatic.com/2022/03/28/tsuki-chapter-461-intermission-daily-life-double-face-bottom/"
+                //"https://www.isekailunatic.com/2022/03/28/tsuki-chapter-461-intermission-daily-life-double-face-bottom/";
                 //"https://www.isekailunatic.com/2022/01/23/tsuki-chapter-461-intermission-daily-life-double-face-top/";
 				//"https://www.isekailunatic.com/2021/12/19/tsuki-chapter-458-victory-conditions/";
                 //"https://www.isekailunatic.com/2021/12/14/tsuki-chapter-457-stone-of-the-monarch/"; 
@@ -167,15 +168,15 @@
 
         console.log("4");
 
-        if (!document.cookie.includes("myCookie=")) {
+        if (!document.cookie.includes("myCookieWikiLiretout=")) {
             console.log("ADD " + document.cookie);
             setCookie();
         } else {
             console.log("document.cookie lercture");
             tab_cookies = document.cookie.split(";");
             tab_cookies.forEach(element => {
-                if (element.startsWith("myCookie=")) {
-                    json = JSON.parse(element.replace("myCookie=", ""));
+                if (element.startsWith("myCookieWikiLiretout=")) {
+                    json = JSON.parse(element.replace("myCookieWikiLiretout=", ""));
                     title = title.replace(/ /g, "");
                     if (json.title.match(title)) {
                         voir_marque_page(json.id);

@@ -1,0 +1,122 @@
+<!DOCTYPE html5>
+<html>
+<header>
+<meta content="charset=utf-8" />
+<!--script language="JavaScript" src="testRTC.js"></script-->
+<script>
+function hasGetUserMedia() {
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
+if (hasGetUserMedia()) {
+  //alert("getUserMedia() OK");
+} else {
+  alert("getUserMedia() is not supported by your browser");
+}
+
+
+
+
+</script>
+
+<header>
+
+<body>
+
+<h1 style="background-color:blue;">BONJOUR</h1>
+<button style="  height: 50px;
+  width: 200px;" onclick="testV();">RELORD</button>
+<div style="background-color:red;">
+BONJOUR
+<video style="display: block;
+    margin-left: auto;
+    margin-right: auto;" id="video" autoplay ></video>
+
+
+
+
+</div>
+
+
+
+
+<script>
+
+	localvideo = document.getElementById("video");
+
+ document.addEventListener("keydown", function (e) {
+        if (e.keyCode == 33) {
+            toggleFullScreen();
+        }
+    }, false);
+
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            localvideo.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+/*
+var constraints = {
+  video: true,
+};
+
+function successCallback(stream){
+	var video = document.querySelector("video");
+	video.src = window.URL.createObjectURL(stream);
+}
+
+function errCallback(error){
+	console.log("getUserMedia error",error);
+}
+
+navigator.mediaDevices.getUserMedia(constraints,successCallback,errCallback);
+*/
+
+const constraints = {
+  video: true,
+  audio: true
+};
+
+const video = document.querySelector("video");
+
+
+function testV(){
+navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+  video.srcObject = stream;
+  console.log(stream);
+  console.log("AUDIO:");
+  console.log(stream.getAudioTracks());
+  console.log("VIDEO:");
+  console.log(stream.getVideoTracks());
+
+});
+}
+testV();
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+</body>
+
+
+<footer>By Thibaud BAYOL</footer>
+
+
+
+</html>
