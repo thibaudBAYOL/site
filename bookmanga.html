@@ -215,6 +215,8 @@
                 </div>
 
                 <button onclick="hidden_nodel('update')">stop Update</button>
+                <button onclick="up_option_ok()">(E)</button>
+                <button onclick="up_option_bad()">(A)</button>
             </div>
         </div>
     </div>
@@ -240,6 +242,8 @@
     var myapiJS;
 
     let table = "table1";
+
+    var global_word = ""
 
     var update_id = undefined;
     var confirm_sup = false;
@@ -298,7 +302,7 @@
             table_header += "<th>Last Modified</th>";
             table_header += "<th> update </th>";
             table_header += "<th> suprime </th>";
-            table_header += "<th> <button onclick=\"All_search_button()\">S_ALL</button> </th>";
+            table_header += "<th> <button onclick=\"All_search_button()\">S_ALL</button><button onclick=\"All_search_button_direct()\">D_ALL</button> </th>";
             //
             table_header += "</tr>";
             contenu = "";
@@ -338,7 +342,7 @@
                 contenu += "<td>";
                 contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";
                 contenu += "</td>";
-                contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button></td>";
+                contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button><button onclick=\"search_button_direct('"+ element.id +"')\">D</button></td>";
                 contenu += "</tr>";
 
             });
@@ -378,6 +382,28 @@
         option = document.getElementById("up_option").value;
         myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
     }
+    function up_option_ok() {
+        option = document.getElementById("up_option").value;
+        option = option.replace("(A)","(E)");
+        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
+    }
+
+    function up_option_bad() {
+        option = document.getElementById("up_option").value;
+        option = option.replace("(E)","(A)");
+        d= new Date();
+        option = option + " \n " + d.toString();
+        console.log("test " + option);
+        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
+        lien = document.getElementById("up_lien").value;
+        if(lien.endsWith("1")){
+            lien = lien + ".";
+        } else{
+            lien = lien + " \n 1";
+        }
+        
+        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]).then(log);
+    }
 
     function up_stop() {
         document.getElementById("update").hidden = true;
@@ -404,6 +430,68 @@
             s += "*<a href=" + tab[i] + " target=\"_blank\" >" + tab[i] + "</a></br>";
         }
         return s;
+    }
+
+    function search_button_direct(id){
+        const max = document.getElementById(id).getElementsByClassName("lien")[0].getElementsByTagName("a").length;
+        console.log("search_button_direct max=" + max);
+        document.getElementById(id).getElementsByClassName("retour")[0].innerHTML ="";
+        search_button_direct_one(id,0,max);
+    }
+
+    function search_button_direct_one(id,compteur,max){
+        console.log("search_button_direct_one " + id + " " + compteur + " <" + max +">");
+        if(compteur<max){
+            
+            const url = document.getElementById(id).getElementsByClassName("lien")[0].getElementsByTagName("a")[compteur].href;
+            var s = "";
+            global_word = document.getElementById("search_button_input").value;
+            if(global_word == ""){
+                const regex = /\/\/([^\/]*)\//;
+                if ((m = regex.exec(url)) !== null) {
+                    m.forEach((match, groupIndex) => {
+                        if(groupIndex=1){
+                            global_word = map_key_word_next.get(match);
+                        }
+                    });
+                }
+            }
+            console.log(global_word+ " "+ url);
+            if(global_word != undefined){
+            myapiJS.get(url).then(function(text){
+                //console.log(text);
+
+                if(text.match("<body>")){
+                    if(text.match(global_word)){
+                        s= "<p class='w3-green'>OUI =" + url + " "+global_word+"</p>";
+                    }else{
+                        s= "<p class='w3-red'>NON =" + url + " "+global_word+"</p>";
+                    }
+                }else{ // SI VIDE
+                    s= "<p class='w3-pink'>VIDE =" + url + "</p>";
+                }
+                document.getElementById(id).getElementsByClassName("retour")[0].innerHTML +=s;
+
+                search_button_direct_one(id,compteur+1,max);
+
+            },function(err){
+                document.getElementById(id).getElementsByClassName("retour")[0].innerHTML +="<p class='w3-blue'>"+url+"err:"+err+"</p>";
+                search_button_direct_one(id,compteur+1,max);
+            });
+
+            }else{
+                document.getElementById(id).getElementsByClassName("retour")[0].innerHTML +="<p>Pas de mot de recherche "+url+"</p>";
+                search_button_direct_one(id,compteur+1,max);
+            }
+        }
+    }
+
+    function All_search_button_direct(){
+        list = document.getElementById("data").getElementsByTagName("tr")
+        for (let index = 1; index < list.length; index++) {
+            const element = list[index].id;
+            search_button_direct(element);
+        }
     }
 
     function search_button(id){
@@ -446,7 +534,7 @@
                     }
                 });
                 }
-                
+
                 if(text.match(/red/)){
                     myapiJS.get("http://localhost:1234/?updateone="+url+"&word=body").then(function(text){
                         if(text.match(/red/)){
@@ -512,12 +600,13 @@
     function setCookie() {
             console.log("setCookie()");
             //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
-            
+            if (document.getElementById("login").value != "" && document.getElementById("mdp").value != ""){
             json = { "login": document.getElementById("login").value , "mdp": document.getElementById("mdp").value };
         
             let co = "myCookie=" + JSON.stringify(json) + "; expires=" + date + " ; samesite=strict";
-            console.log("setCookie:" + co)
+            console.log("setCookie:" + co);
             document.cookie = co;
+            }
     }
 
     function connection() {
@@ -532,8 +621,8 @@
         document.getElementById("login").value = login;
         document.getElementById("mdp").value = mdp;
         
-        localStorage.removeItem("login");
-        localStorage.removeItem("mdp");
+        //localStorage.removeItem("login");
+        //localStorage.removeItem("mdp");
     }
 
     // lire le cookie (login mdp)
@@ -541,7 +630,7 @@
             console.log("ADD " + document.cookie);
             setCookie();
     } else {
-            console.log("document.cookie lercture");
+            console.log("document.cookie lecture");
             tab_cookies = document.cookie.split(";");
             tab_cookies.forEach(element => {
                 if (element.startsWith("myCookie=")) {

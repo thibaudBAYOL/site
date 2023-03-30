@@ -1,0 +1,34 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Lire_Web_JS</title>
+    <script src="js/apiJS.js"></script>
+</head>
+
+<body>
+    <input type="text" id="url" />
+    <button onclick="lire()">LIRE</button>
+
+<div id="data"></div>
+
+</body>
+
+
+<script>
+
+var myapiJS = new ApiClient();
+
+function lire(){
+    url = document.getElementById("url").value;
+    document.getElementById("data").innerHTML = "";
+    myapiJS.get(url).then(function(text){
+        document.getElementById("data").innerHTML = text
+    },function(err){
+        document.getElementById("data").innerHTML = err;
+    })
+}
+    
+</script>
+
+</html>
