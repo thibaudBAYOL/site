@@ -120,6 +120,7 @@
                     </select>
                     <input type="password" id="mdp" />
                     <button onclick="connection()">CONNECTION</button>
+                    <button onclick="connection_all()">CONNECTION ALL</button>
                     <button onclick="hidden_nodel('co')">ANNULER</button>
                 </div>
             </div>
@@ -231,13 +232,21 @@
     <div id="data">
 
     </div>
-    
+    <p>data2</p>
+    <div id="data2">
 
+    </div>
+    <p>data3</p>
+    <div id="data3">
+
+    </div>
 
 </body>
 
 <script>
     var myAirtable;
+    var myAirtable2;
+    var myAirtable3;
     var myAirtableSpy;
     var myapiJS;
 
@@ -272,6 +281,12 @@
             s = andor + "(" + s + ")";
         }
         myAirtable.getAirtable(null, "filterByFormula=" + s + "&sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10&pageSize=10").then(print_table);
+        if(myAirtable2 != null) {
+            myAirtable2.getAirtable(null, "filterByFormula=" + s + "&sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10&pageSize=10").then(print_table2);
+        }
+        if(myAirtable3 != null) {
+            myAirtable3.getAirtable(null, "filterByFormula=" + s + "&sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10&pageSize=10").then(print_table3);
+        }
     }
 
 
@@ -288,8 +303,13 @@
     function my_sort(sort) {
         myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10").then(print_table);
     }
-
-    function print_table(rep) {
+    
+    /*
+    rep,
+    id, : quelle est l'id de la balise
+    modif : permet de modifier
+    */
+    function print_table_param(rep,id_data,modif) {
         if (rep.records.length >= 1) {
             table_header = "<tr>";
 
@@ -336,13 +356,19 @@
                 
                 contenu += "</td>";
                 contenu += "<td>";
+                if (modif) {
                 contenu += "<button onclick=\"update('" + element.id + "')\">M</button>";
+                }
                 contenu += "</td>";
 
                 contenu += "<td>";
-                contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";
+                if (modif) {
+                  contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";  
+                }
                 contenu += "</td>";
+                if (modif) {
                 contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button><button onclick=\"search_button_direct('"+ element.id +"')\">D</button></td>";
+                }
                 contenu += "</tr>";
 
             });
@@ -351,10 +377,20 @@
             } else {
                 my_next = "";
             }
-            document.getElementById('data').innerHTML = "<table>" + table_header + contenu + "</table>" + my_next + "<h3>count=" + rep.records.length + "</h3>";
+            document.getElementById(id_data).innerHTML = "<table>" + table_header + contenu + "</table>" + my_next + "<h3>count=" + rep.records.length + "</h3>";
         } else {
-            document.getElementById('data').innerHTML = "<h3>NO FOUND</h3>"
+            document.getElementById(id_data).innerHTML = "<h3>NO FOUND</h3>"
         }
+    }
+
+    function print_table(rep) {
+        print_table_param(rep,'data',true);
+    }
+    function print_table2(rep) {
+        print_table_param(rep,'data2',false);
+    }
+    function print_table3(rep) {
+        print_table_param(rep,'data3',false);
     }
 
     function update(id) {
@@ -537,9 +573,7 @@
 
                 if(text.match(/red/)){
                     myapiJS.get("http://localhost:1234/?updateone="+url+"&word=body").then(function(text){
-                        if(text.match(/red/)){
-                            
-                            regex2 = /Lien \[([^\}]*)\]/;
+                        regex2 = /Lien \[([^\}]*)\]/;
                             if ((m = regex2.exec(text)) !== null) {
                             m.forEach((match, groupIndex) => {
                                 if(groupIndex=1){
@@ -547,9 +581,14 @@
                                 }
                             });
                             }
-                            document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-pink'>VIDE =" + url + "</p>";
-                        }
+                        if(text.match(/red/)){document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-pink'>VIDE =" + url + "</p>";}
                         
+                        myapiJS.get("http://localhost:1234/?url="+url).then(function(text){
+                        if(text.match(/404 - PAGE NOT FOUND/)) document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-pink'>404 </p>";
+                        if(text.match(/Sorry, the page you have requested cannot be found/)) document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-pink'>Sorry </p>";
+                        },function(err){
+                            document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-blue'>err:"+err+"</p>";
+                        });
                     },function(err){
                         document.getElementById(id).getElementsByClassName("retour")[0].innerHTML += "<p class='w3-blue'>err:"+err+"</p>";
                     });
@@ -613,6 +652,17 @@
         login = document.getElementById("login").value;
         mdp = document.getElementById("mdp").value;
         myAirtable = new ApiAirtable(login, table, mdp);
+        myAirtable2 = null;
+        myAirtable3 = null;
+        setCookie();
+        hidden_nodel("co");
+    }
+
+    function connection_all() {
+        mdp = document.getElementById("mdp").value;
+        myAirtable = new ApiAirtable(document.getElementById('log').getElementsByTagName('option')[0].value, table, mdp);
+        myAirtable2 = new ApiAirtable(document.getElementById('log').getElementsByTagName('option')[1].value, table, mdp);
+        myAirtable3 = new ApiAirtable(document.getElementById('log').getElementsByTagName('option')[2].value, table, mdp);
         setCookie();
         hidden_nodel("co");
     }
