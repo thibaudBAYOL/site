@@ -41,7 +41,7 @@
 </body>
 <script>
 
-
+    var test = false;
 
     var date = new Date();
     date.setDate(date.getDate() + 365);
@@ -50,7 +50,7 @@
     getCookie();
 
     function add_crono(){
-        Console.log("add_crono");
+        my_test("add_crono");
         
         var input_name = document.createElement("input");
         input_name.type ='text';
@@ -83,7 +83,7 @@
             if (element.startsWith("myCookieDateCrono=")) {
                 json = JSON.parse(element.replace("myCookieDateCrono=", ""));
                 tab = document.getElementsByClassName("date_ref");
-                console.log(json.list.length + ' ' + tab.length)
+                my_test(json.list.length + " " + tab.length);
                 if (json.list.length > tab.length) {
                     // crée div <div> <input type='text' name="name" /> <input type='date' name="date" /> <p name="crono"></p> </div> dans <body>
                     for (var i = tab.length - 1; i < json.list.length; i++) {
@@ -93,6 +93,7 @@
                 }
                 
                 for (var i = 0; i < json.list.length; i++) {
+                    my_test("l.69 :"+i);
                     tab[i].children.name.value = json.list[i].name;
                     tab[i].children.date.value = json.list[i].date;
                     tab[i].children.time.value = json.list[i].time;
@@ -175,6 +176,10 @@
 
     //update();
     setInterval(update,1000);
+
+    function my_test(msg){
+        if(test) console.log(msg);
+    }
 
 </script>
 
