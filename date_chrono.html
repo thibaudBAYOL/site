@@ -46,7 +46,7 @@
     var date = new Date();
     date.setDate(date.getDate() + 365);
     date = date.toUTCString();
-    console.log(date);
+    my_test(date);
     getCookie();
 
     function add_crono(){
@@ -77,12 +77,13 @@
 
     function getCookie() {
 
-        console.log("document.cookie lecture");
+        my_test("document.cookie lecture");
         tab_cookies = document.cookie.split(";");
         tab_cookies.forEach(element => {
             if (element.startsWith("myCookieDateCrono=")) {
                 json = JSON.parse(element.replace("myCookieDateCrono=", ""));
                 tab = document.getElementsByClassName("date_ref");
+                my_test(json);
                 my_test(json.list.length + " " + tab.length);
                 if (json.list.length > tab.length) {
                     // crée div <div> <input type='text' name="name" /> <input type='date' name="date" /> <p name="crono"></p> </div> dans <body>
@@ -102,7 +103,7 @@
         });
     }
     function setCookie() {
-        console.log("setCookie()");
+        my_test("setCookie()");
         //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
         liste = [];
         tab = document.getElementsByClassName("date_ref");
@@ -117,7 +118,7 @@
         json = { "list": liste };
 
         let co = "myCookieDateCrono=" + JSON.stringify(json) + "; expires=" + date + " ; samesite=strict";
-        console.log("setCookie:" + co);
+        my_test("setCookie:" + co);
         document.cookie = co;
     }
 
@@ -140,7 +141,6 @@
 
                 tab[i].children.crono.innerHTML = mstodelay(date_dif);
             }
-//            console.log( i +' update name='+tab[i].children.name.value + " date=" + tab[i].children.date.value +" diff="+date_dif+" crono=" + tab[i].children.crono.value);
         }
     }
 
