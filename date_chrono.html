@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -23,6 +24,18 @@
         <input type='time' name="time" />
         <p name="crono"></p>
     </div>
+    <div  class="date_ref">
+        <input type='text' name="name" />
+        <input type='date' name="date" />
+        <input type='time' name="time" />
+        <p name="crono"></p>
+    </div>
+    <div  class="date_ref">
+        <input type='text' name="name" />
+        <input type='date' name="date" />
+        <input type='time' name="time" />
+        <p name="crono"></p>
+    </div>
 
 
 </body>
@@ -37,7 +50,7 @@
     getCookie();
 
     function add_crono(){
-
+        Console.log("add_crono");
         
         var input_name = document.createElement("input");
         input_name.type ='text';
@@ -69,8 +82,8 @@
         tab_cookies.forEach(element => {
             if (element.startsWith("myCookieDateCrono=")) {
                 json = JSON.parse(element.replace("myCookieDateCrono=", ""));
-
                 tab = document.getElementsByClassName("date_ref");
+                console.log(json.list.length + ' ' + tab.length)
                 if (json.list.length > tab.length) {
                     // crée div <div> <input type='text' name="name" /> <input type='date' name="date" /> <p name="crono"></p> </div> dans <body>
                     for (var i = tab.length - 1; i < json.list.length; i++) {
@@ -78,6 +91,7 @@
                     }
                     tab = document.getElementsByClassName("date_ref");
                 }
+                
                 for (var i = 0; i < json.list.length; i++) {
                     tab[i].children.name.value = json.list[i].name;
                     tab[i].children.date.value = json.list[i].date;
@@ -119,8 +133,7 @@
                 //tab[i].getElementsByName("date").value
                 time = tab[i].children.time.value;
                 if (time == "") time = "00:00";
-                
-                console.log(i+"update " + tab[i].children.date.value + " " + time);
+
                 date_ref = new Date(tab[i].children.date.value + " " + time);
                 date_dif = d.getTime() - date_ref.getTime();
 
