@@ -14,11 +14,13 @@
     <div  class="date_ref">
         <input type='text' name="name"/>
         <input type='date' name="date" />
+        <input type='time' name="time" />
         <p name="crono"></p>
     </div>
     <div  class="date_ref">
         <input type='text' name="name" />
         <input type='date' name="date" />
+        <input type='time' name="time" />
         <p name="crono"></p>
     </div>
 
@@ -35,12 +37,7 @@
     getCookie();
 
     function add_crono(){
-        //document.getElementsByTagName("body").innerHTML = 
-        //"<div   class='date_ref'>  <input type='text' name='name' /> 
-        //    <input type='date' name='date' /> 
-        //    <p name='crono'></p> 
-        //    </div>" 
-        //    + document.getElementsByTagName("body").innerHTML;
+
         
         var input_name = document.createElement("input");
         input_name.type ='text';
@@ -48,12 +45,17 @@
         var input_date = document.createElement("input");
         input_date.type ='date';
         input_date.name ='date';
+        var input_time = document.createElement("input");
+        input_time.type ='time';
+        input_time.name ='time';
         var p_crono = document.createElement("p");
-        p_crono.name ='crono'
+        p_crono.setAttribute("name", "crono");
+        //p_crono.name ='crono';
         var div = document.createElement("div");
-        div.class = "date_ref";
+        div.classList.add('date_ref');
         div.appendChild(input_name);
         div.appendChild(input_date);
+        div.appendChild(input_time);
         div.appendChild(p_crono);
 
         document.getElementsByTagName("body")[0].appendChild(div);
@@ -79,7 +81,7 @@
                 for (var i = 0; i < json.list.length; i++) {
                     tab[i].children.name.value = json.list[i].name;
                     tab[i].children.date.value = json.list[i].date;
-
+                    tab[i].children.time.value = json.list[i].time;
                 }
             }
         });
@@ -93,7 +95,7 @@
         for (var i = 0; i < tab.length; i++) {
             if (tab[i].children.name.value != "") {
                 // {'name': "test" , "date": date};
-                liste.push({ 'name': tab[i].children.name.value, "date": tab[i].children.date.value });
+                liste.push({ 'name': tab[i].children.name.value, "date": tab[i].children.date.value,"time":tab[i].children.time.value });
             }
         }
         //{"name": "TEST" , "date":date.getDate()}
@@ -115,7 +117,11 @@
         for (var i = 0; i < tab.length; i++) {
             if (tab[i].children.name.value != "") {
                 //tab[i].getElementsByName("date").value
-                date_ref = new Date(tab[i].children.date.value);
+                time = tab[i].children.time.value;
+                if (time == "") time = "00:00";
+                
+                console.log(i+"update " + tab[i].children.date.value + " " + time);
+                date_ref = new Date(tab[i].children.date.value + " " + time);
                 date_dif = d.getTime() - date_ref.getTime();
 
                 tab[i].children.crono.innerHTML = mstodelay(date_dif);
@@ -126,6 +132,12 @@
 
     function mstodelay(ms){
         // annee
+        if(ms < 0){
+            minus ="-";
+        }else{
+            minus ="+";
+        } 
+        ms = Math.abs(ms);
 
         year = Math.floor(ms / (1000*60*60*24*365));
         ms = ms - (year * (1000*60*60*24*365))
@@ -143,7 +155,7 @@
         ms = ms - (minute * (1000*60))
         // seconde
         seconde = Math.floor(ms / (1000));
-        return  year+ " ans, "+month+" mois, "+day+" jour, "+hours+" heurs, "+minute+" minutes et "+seconde +" secondes";
+        return  minus+" "+ year+ " ans, "+month+" mois, "+day+" jour, "+hours+" heurs, "+minute+" minutes et "+seconde +" secondes";
         // ,"Y M d //h:m:s"
 
     }
