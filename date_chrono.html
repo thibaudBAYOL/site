@@ -79,7 +79,9 @@
 
         my_test("document.cookie lecture");
         tab_cookies = document.cookie.split(";");
+        my_test(document.cookie);
         tab_cookies.forEach(element => {
+            my_test("element="+element);
             if (element.startsWith("myCookieDateCrono=")) {
                 json = JSON.parse(element.replace("myCookieDateCrono=", ""));
                 tab = document.getElementsByClassName("date_ref");
