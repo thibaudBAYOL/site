@@ -18,8 +18,10 @@
         }
 
         button {
-            /*font-size: large;*/
-            font-size: medium;
+            font-size: large;
+            /*font-size: medium;*/
+            min-width: 100%;
+            min-height: 50px;
         }
         button:checked {
             background-color: rgb(0, 166, 255);
@@ -113,7 +115,7 @@
                 <div class="w3-container">
                     <span onclick="hidden_nodel('co')" class="w3-button w3-bar w3-red">&times;</span>
                     <input type="text" id="login" />
-                    <select id="log" onclick="move_log()">
+                    <select id="log" onclick="move_log()" onchange="move_log()">
                         <option value="appx6X604pwo3AyKs" selected>testV2</option>
                         <option value="appY5cp94QUoFgKvI">testV2Plus0</option>
                         <option value="app4IapjlBZY9JZA4">testV2Plus1</option>
@@ -255,6 +257,7 @@
     var global_word = ""
 
     var update_id = undefined;
+    var update_num_data = undefined;
     var confirm_sup = false;
 
     var map_key_word_next = new Map;
@@ -293,15 +296,33 @@
 
     function one() {
         myAirtable.getAirtable(null, 'pageSize=1').then(print_table);
+        if(myAirtable2 != null) {
+            myAirtable2.getAirtable(null, 'pageSize=1').then(print_table2);
+        }
+        if(myAirtable3 != null) {
+            myAirtable3.getAirtable(null, 'pageSize=1').then(print_table3);
+        }
     }
 
     function f_all() {
         myAirtable.getAirtable(null, "pageSize=10").then(print_table);
+        if(myAirtable2 != null) {
+            myAirtable2.getAirtable(null, "pageSize=10").then(print_table2);
+        }
+        if(myAirtable3 != null) {
+            myAirtable3.getAirtable(null, "pageSize=10").then(print_table3);
+        }
     }
 
 
     function my_sort(sort) {
         myAirtable.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10").then(print_table);
+        if(myAirtable2 != null) {
+            myAirtable2.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10").then(print_table2);
+        }
+        if(myAirtable3 != null) {
+            myAirtable3.getAirtable(null, "sort%5B0%5D%5Bfield%5D=Last Modified&sort%5B0%5D%5Bdirection%5D=" + sort + "&pageSize=10").then(print_table3);
+        }
     }
     
     /*
@@ -357,13 +378,13 @@
                 contenu += "</td>";
                 contenu += "<td>";
                 if (modif) {
-                contenu += "<button onclick=\"update('" + element.id + "')\">M</button>";
+                contenu += "<button onclick=\"update('" + element.id + "','" + id_data + "')\">M</button>";
                 }
                 contenu += "</td>";
 
                 contenu += "<td>";
                 if (modif) {
-                  contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "')\">M</button>";  
+                  contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "','" + id_data + "')\">M</button>";  
                 }
                 contenu += "</td>";
                 if (modif) {
@@ -387,14 +408,49 @@
         print_table_param(rep,'data',true);
     }
     function print_table2(rep) {
-        print_table_param(rep,'data2',false);
+        print_table_param(rep,'data2',true);
     }
     function print_table3(rep) {
-        print_table_param(rep,'data3',false);
+        print_table_param(rep,'data3',true);
     }
 
-    function update(id) {
+    function my_updateAirtable(data){
+        switch (update_num_data) {
+            case "data":
+                myAirtable.updateAirtable(data).then(log);
+                break;
+            case "data2":
+                myAirtable2.updateAirtable(data).then(log);
+                break;
+            case "data3":
+                myAirtable3.updateAirtable(data).then(log);
+                break;
+            default:
+                console.log("update_num_data inconnu");
+                break;
+        }
+    }
+
+    function my_deleteAirtable(data){
+        switch (update_num_data) {
+            case "data":
+                myAirtable.deleteAirtable(data).then(log);
+                break;
+            case "data2":
+                myAirtable2.deleteAirtable(data).then(log);
+                break;
+            case "data3":
+                myAirtable3.deleteAirtable(data).then(log);
+                break;
+            default:
+                console.log("update_num_data inconnu");
+                break;
+        }
+    }
+
+    function update(id,num_data) {
         update_id = id;
+        update_num_data = num_data;
         document.getElementById("up_id").innerHTML = id;
         show_nodel("update")
         titre = document.getElementById(id).getElementsByClassName("titre")[0].attributes[1].value;
@@ -403,25 +459,25 @@
         document.getElementById("up_lien").value = lien;
         option = document.getElementById(id).getElementsByClassName("option")[0].attributes[1].value;
         document.getElementById("up_option").value = option;
-        //myAirtable.updateAirtable([{'id':id,'fields':{ 'Name': titre, 'urls': lien, 'option': add_option }}]).then(log);
+        //my_updateAirtable([{'id':id,'fields':{ 'Name': titre, 'urls': lien, 'option': add_option }}]);
     }
 
     function up_titre() {
         titre = document.getElementById("up_titre").value;
-        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'Name': titre } }]).then(log);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'Name': titre } }]);
     }
     function up_lien() {
         lien = document.getElementById("up_lien").value;
-        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]).then(log);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]);
     }
     function up_option() {
         option = document.getElementById("up_option").value;
-        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]);
     }
     function up_option_ok() {
         option = document.getElementById("up_option").value;
         option = option.replace("(A)","(E)");
-        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]);
     }
 
     function up_option_bad() {
@@ -430,7 +486,7 @@
         d= new Date();
         option = option + " \n " + d.toString();
         console.log("test " + option);
-        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]).then(log);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]);
         lien = document.getElementById("up_lien").value;
         if(lien.endsWith("1")){
             lien = lien + ".";
@@ -438,17 +494,18 @@
             lien = lien + " \n 1";
         }
         
-        myAirtable.updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]).then(log);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]);
     }
 
     function up_stop() {
         document.getElementById("update").hidden = true;
     }
 
-    function sup(id, titre) {
+    function sup(id, titre,num_data) {
+        update_num_data = num_data;
         const titre0 = titre.split("\n")[0];
         if (confirm("Confirmé la supression de " + titre0) == true) {
-            myAirtable.deleteAirtable([id]).then(log);
+            my_deleteAirtable([id]);
         }
     }
 
@@ -675,22 +732,27 @@
         //localStorage.removeItem("mdp");
     }
 
-    // lire le cookie (login mdp)
-    if (!document.cookie.includes("myCookie=")) {
-            console.log("ADD " + document.cookie);
-            setCookie();
-    } else {
-            console.log("document.cookie lecture");
-            tab_cookies = document.cookie.split(";");
-            tab_cookies.forEach(element => {
-                if (element.startsWith("myCookie=")) {
-                    json = JSON.parse(element.replace("myCookie=", ""));
-                    document.getElementById("login").value = json.login;
-                    document.getElementById("mdp").value = json.mdp;
-                }
-            });
+
+    function getCookie(){
+        // lire le cookie (login mdp)
+        if (!document.cookie.includes("myCookie=")) {
+                console.log("ADD " + document.cookie);
+                setCookie();
+        } else {
+                console.log("document.cookie lecture");
+                tab_cookies = document.cookie.split("; ");
+                tab_cookies.forEach(element => {
+                    if (element.startsWith("myCookie=")) {
+                        json = JSON.parse(element.replace("myCookie=", ""));
+                        document.getElementById("login").value = json.login;
+                        document.getElementById("mdp").value = json.mdp;
+                    }
+                });
+        }
     }
 
+    
+    getCookie();
 
 
     if ((login = document.getElementById("login").value) != null && (mdp = document.getElementById("mdp").value) != null) {
