@@ -122,6 +122,9 @@ init_calendar();
                     box.style.backgroundColor = "yellow"
                     box.innerHTML = box.innerHTML + "<p><b>"+json.list[i].name+"<b></p>";
                 }
+                d = new Date();
+                box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1));
+                box.style.backgroundColor = "red";
             }
         });
     }
