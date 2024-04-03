@@ -4,6 +4,11 @@
 <head>
     <meta charset="utf-8" />
     <title>date crono</title>
+    <style>
+        table, th, td {
+        border: 1px solid;
+        }
+    </style>
 </head>
 
 <body>
@@ -113,8 +118,9 @@ init_calendar();
                     tab[i].children.date.value = json.list[i].date;
                     tab[i].children.time.value = json.list[i].time;
                     d = new Date(json.list[i].date);
-                    box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1);
-                    box.innerHTML = box.innerHTML + "<p>"+json.list[i].name+"</p>";
+                    box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1));
+                    box.style.backgroundColor = "yellow"
+                    box.innerHTML = box.innerHTML + "<p><b>"+json.list[i].name+"<b></p>";
                 }
             }
         });
