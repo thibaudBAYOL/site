@@ -11,7 +11,8 @@
     <input type = "button" onclick="setCookie()" value ="SET Cookie"></input>
     <input type = "button" onclick="getCookie()" value ="GET Cookie"></input>
     <input type = "button" onclick="add_crono()" value ="Nouveau"></input>
-
+<table id="calendar">
+</table>
     <div  class="date_ref">
         <input type='text' name="name"/>
         <input type='date' name="date" />
@@ -49,6 +50,17 @@
     my_test(date);
     getCookie();
 
+function init_calendar(){
+    html ="";
+    for (var m = 1; m <= 12; m++) {
+        html = html + "<tr>";
+    for (var d = 1; d <= 31; d++) {
+    html = html + "<td id='"+d+"/"+m+"'>"+d+"/"+m+"</td>";
+    }
+        html = html + "</tr>";
+    }
+    document.getElementById("calendar").innerHTML = html;
+}
     function add_crono(){
         my_test("add_crono");
         
@@ -76,7 +88,7 @@
         }
 
     function getCookie() {
-
+init_calendar();
         my_test("document.cookie lecture");
         tab_cookies = document.cookie.split("; ");
         my_test(document.cookie);
@@ -100,6 +112,9 @@
                     tab[i].children.name.value = json.list[i].name;
                     tab[i].children.date.value = json.list[i].date;
                     tab[i].children.time.value = json.list[i].time;
+                    d = new Date(json.list[i].date);
+                    box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1);
+                    box.innerHTML = box.innerHTML + "<p>"+json.list[i].name+"</p>";
                 }
             }
         });
