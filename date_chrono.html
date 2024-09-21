@@ -117,10 +117,11 @@ init_calendar();
                     tab[i].children.name.value = json.list[i].name;
                     tab[i].children.date.value = json.list[i].date;
                     tab[i].children.time.value = json.list[i].time;
+                    tab[i].id= "date_ref_" + i;
                     d = new Date(json.list[i].date);
                     box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1));
                     box.style.backgroundColor = "yellow"
-                    box.innerHTML = box.innerHTML + "<p><b>"+json.list[i].name+"<b></p>";
+                    box.innerHTML = box.innerHTML + "<p><a href='#"+tab[i].id+"'><b>"+json.list[i].name+"<b></a></p>";
                 }
             }
         });
