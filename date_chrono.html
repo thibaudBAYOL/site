@@ -13,6 +13,7 @@
 
 <body>
     <p id="timer"></p>
+    <input id="immortal" type = "checkbox" onclick="immortal=this.checked">Cookie immortel?</input>
     <input type = "button" onclick="setCookie()" value ="SET Cookie"></input>
     <input type = "button" onclick="getCookie()" value ="GET Cookie"></input>
     <input type = "button" onclick="add_crono()" value ="Nouveau"></input>
@@ -48,7 +49,7 @@
 <script>
 
     var test = false;
-
+    var immortal = false;
     var date = new Date();
     date.setDate(date.getDate() + 365);
     date = date.toUTCString();
@@ -128,6 +129,16 @@ init_calendar();
                 d = new Date();
                 box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1));
                 box.style.backgroundColor = "red";
+
+                
+                if(json.immortal != undefined ){
+                    immortal = json.immortal;
+                    my_test("immortal=" + immortal);
+                    document.getElementById("immortal").checked = immortal;
+                    if (immortal = true) document.getElementById("immortal").nextSibling.data =""
+                }else{
+                    document.getElementById("immortal").checked = false;
+                }
             }
         });
     }
@@ -144,6 +155,11 @@ init_calendar();
     }
 
     function setCookie() {
+        if (immortal=true) {
+            var date0 = new Date();
+            date0.setDate(date0.getDate() + 1000*365);
+            date = date0.toUTCString();
+        }
         my_test("setCookie()");
         //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
         liste = [];
@@ -156,7 +172,7 @@ init_calendar();
             }
         }
         //{"name": "TEST" , "date":date.getDate()}
-        json = { "list": liste };
+        json = { "list": liste,"immortal":immortal };
 
         let co = "myCookieDateCrono=" + JSON.stringify(json) + "; expires=" + date + " ; samesite=strict";
         my_test("setCookie:" + co);
@@ -180,9 +196,32 @@ init_calendar();
                 date_ref = new Date(tab[i].children.date.value + " " + time);
                 date_dif = d.getTime() - date_ref.getTime();
 
-                tab[i].children.crono.innerHTML = mstodelay(date_dif);
+                tab[i].children.crono.innerHTML = delayindate(date_ref,d) +" (" + mstodelay(date_dif)+")";
             }
         }
+    }
+
+    function delayindate(start,end){
+
+        if(end.getTime() < start.getTime()){
+            minus ="-";
+        }else{
+            minus ="+";
+        }
+
+        year = end.getYear() - start.getYear();
+        // mois
+        month = (end.getMonth()+1) - (start.getMonth()+1);
+        // jour
+        day = end.getDate() - start.getDate();
+        // heurs
+        hours = end.getHours() - start.getHours();
+        // minute
+        minute = end.getMinutes() - start.getMinutes();
+
+        seconde = end.getSeconds() - start.getSeconds();
+
+        return   minus+" "+year+ " ans, "+month+" mois, "+day+" jour(s), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)"; 
     }
 
     function mstodelay(ms){
@@ -194,12 +233,6 @@ init_calendar();
         } 
         ms = Math.abs(ms);
 
-        year = Math.floor(ms / (1000*60*60*24*365));
-        ms = ms - (year * (1000*60*60*24*365))
-        // mois
-        month = Math.floor(ms / (1000*60*60*24*30));
-        ms = ms - (month * (1000*60*60*24*30))
-        // jour
         day = Math.floor(ms / (1000*60*60*24));
         ms = ms - (day * (1000*60*60*24))
         // heurs
@@ -210,7 +243,7 @@ init_calendar();
         ms = ms - (minute * (1000*60))
         // seconde
         seconde = Math.floor(ms / (1000));
-        return  minus+" "+ year+ " ans, "+month+" mois, "+day+" jour, "+hours+" heurs, "+minute+" minutes et "+seconde +" secondes";
+        return   minus+" "+day+" jour(s), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)";
         // ,"Y M d //h:m:s"
 
     }
