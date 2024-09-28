@@ -21,26 +21,22 @@
 </table>
     <div  class="date_ref">
         <input type='text' name="name"/>
-        <input type='date' name="date" />
-        <input type='time' name="time" />
+        <input type='datetime-local' name="date" />
         <p name="crono"></p>
     </div>
     <div  class="date_ref">
         <input type='text' name="name" />
-        <input type='date' name="date" />
-        <input type='time' name="time" />
+        <input type='datetime-local' name="date" /
         <p name="crono"></p>
     </div>
     <div  class="date_ref">
         <input type='text' name="name" />
-        <input type='date' name="date" />
-        <input type='time' name="time" />
+        <input type='datetime-local' name="date" />
         <p name="crono"></p>
     </div>
     <div  class="date_ref">
         <input type='text' name="name" />
-        <input type='date' name="date" />
-        <input type='time' name="time" />
+        <input type='datetime-local' name="date" />
         <p name="crono"></p>
     </div>
 
@@ -74,11 +70,8 @@ function init_calendar(){
         input_name.type ='text';
         input_name.name ='name';
         var input_date = document.createElement("input");
-        input_date.type ='date';
+        input_date.type ='datetime-local';
         input_date.name ='date';
-        var input_time = document.createElement("input");
-        input_time.type ='time';
-        input_time.name ='time';
         var p_crono = document.createElement("p");
         p_crono.setAttribute("name", "crono");
         //p_crono.name ='crono';
@@ -86,7 +79,6 @@ function init_calendar(){
         div.classList.add('date_ref');
         div.appendChild(input_name);
         div.appendChild(input_date);
-        div.appendChild(input_time);
         div.appendChild(p_crono);
 
         document.getElementsByTagName("body")[0].appendChild(div);
@@ -114,12 +106,11 @@ init_calendar();
                 }
                 
                 for (var i = 0; i < json.list.length; i++) {
-                    my_test("l.69 :"+i);
+                    my_test("l.69 :"+i+ " " + json.list[i].date);
                     tab[i].children.name.value = json.list[i].name;
                     tab[i].children.date.value = json.list[i].date;
-                    tab[i].children.time.value = json.list[i].time;
                     tab[i].id= "date_ref_" + i;
-                    if(json.list[i].name != "" && json.list[i].date != ""  ){
+                    if(json.list[i].name != "" && json.list[i].date != ""  && json.list[i].date != 'Invalid Date' ){
                         d = new Date(json.list[i].date);
                         box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1));
                         box.style.backgroundColor = "yellow"
@@ -168,7 +159,7 @@ init_calendar();
         for (var i = 0; i < tab.length; i++) {
             if (tab[i].children.name.value != "") {
                 // {'name': "test" , "date": date};
-                liste.push({ 'name': tab[i].children.name.value, "date": tab[i].children.date.value,"time":tab[i].children.time.value });
+                liste.push({ 'name': tab[i].children.name.value, "date": tab[i].children.date.value/*,"time":tab[i].children.time.value*/});
             }
         }
         //{"name": "TEST" , "date":date.getDate()}
@@ -190,15 +181,15 @@ init_calendar();
         for (var i = 0; i < tab.length; i++) {
             if (tab[i].children.name.value != "") {
                 //tab[i].getElementsByName("date").value
-                time = tab[i].children.time.value;
-                if (time == "") time = "00:00";
-
-                date_ref = new Date(tab[i].children.date.value + " " + time);
+                date_ref = new Date(tab[i].children.date.value);
                 date_dif = d.getTime() - date_ref.getTime();
-
                 tab[i].children.crono.innerHTML = delayindate(date_ref,d) +" (" + mstodelay(date_dif)+")";
             }
         }
+    }
+
+    function daysInMonth(month, year) {
+        return new Date(year, month, 0).getDate();
     }
 
     function delayindate(start,end){
@@ -209,19 +200,28 @@ init_calendar();
             minus ="+";
         }
 
-        year = end.getYear() - start.getYear();
+        year = end.getFullYear() - start.getFullYear();
         // mois
         month = (end.getMonth()+1) - (start.getMonth()+1);
+        if (month<0 && minus == "+") { year--; month=12+month}
+        if (month>0 && minus == "-") {my_test("month-:" + month); year++; month=12-month}
         // jour
         day = end.getDate() - start.getDate();
+        if (day<0 && minus == "+") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())+day}
+        if (day>0 && minus == "-") { month++; day=daysInMonth(end.getFullYear(),end.getMonth())-day}
         // heurs
         hours = end.getHours() - start.getHours();
+        if (hours<0 && minus == "+") { day--; hours=24+hours}
+        if (hours>0 && minus == "-") { day++; hours=24-hours}
         // minute
         minute = end.getMinutes() - start.getMinutes();
-
+        if (minute<0 && minus == "+") { hours--; minute=60+minute}
+        if (minute>0 && minus == "-") { hours++; minute=60-minute}
         seconde = end.getSeconds() - start.getSeconds();
-
-        return   minus+" "+year+ " ans, "+month+" mois, "+day+" jour(s), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)"; 
+        if (seconde<0 && minus == "+") { minute--; seconde=60+seconde}
+        if (seconde>0 && minus == "-") { minute++; seconde=60-seconde}
+        
+        return   minus+" "+Math.abs(year)+ " ans, "+Math.abs(month)+" mois, "+Math.abs(day)+" jour(s), "+Math.abs(hours)+" heur(s), "+Math.abs(minute)+" minute(s) et "+Math.abs(seconde) +" seconde(s)"; 
     }
 
     function mstodelay(ms){
