@@ -26,7 +26,7 @@
     </div>
     <div  class="date_ref">
         <input type='text' name="name" />
-        <input type='datetime-local' name="date" /
+        <input type='datetime-local' name="date" />
         <p name="crono"></p>
     </div>
     <div  class="date_ref">
@@ -204,7 +204,7 @@ init_calendar();
         // mois
         month = (end.getMonth()+1) - (start.getMonth()+1);
         if (month<0 && minus == "+") { year--; month=12+month}
-        if (month>0 && minus == "-") {my_test("month-:" + month); year++; month=12-month}
+        if (month>0 && minus == "-") { year++; month=12-month}
         // jour
         day = end.getDate() - start.getDate();
         if (day<0 && minus == "+") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())+day}
