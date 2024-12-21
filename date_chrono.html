@@ -13,6 +13,7 @@
 
 <body>
     <p id="timer"></p>
+    <p id="timer_local"></p>
     <input id="immortal" type = "checkbox" onclick="immortal=this.checked">Cookie immortel?</input>
     <input type = "button" onclick="setCookie()" value ="SET Cookie"></input>
     <input type = "button" onclick="getCookie()" value ="GET Cookie"></input>
@@ -172,7 +173,9 @@ init_calendar();
 
     function update() {
         var d = new Date();
-        document.getElementById("timer").innerHTML = d.toUTCString();
+        document.getElementById("timer").innerHTML = "UTC:" + d.toUTCString();
+        document.getElementById("timer_local").innerHTML = "Local:" + d.toString();
+        
         var date_ref;
         var date_dif;
         //d.getTime();
@@ -201,25 +204,37 @@ init_calendar();
         }
 
         year = end.getFullYear() - start.getFullYear();
+        year = Math.abs(year)
         // mois
         month = (end.getMonth()+1) - (start.getMonth()+1);
+
         if (month<0 && minus == "+") { year--; month=12+month}
-        if (month>0 && minus == "-") { year++; month=12-month}
+        if (month>0 && minus == "-") { year--; month=12-month}
+
+        month = Math.abs(month)
         // jour
         day = end.getDate() - start.getDate();
         if (day<0 && minus == "+") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())+day}
-        if (day>0 && minus == "-") { month++; day=daysInMonth(end.getFullYear(),end.getMonth())-day}
+        if (day>0 && minus == "-") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())-day}
+
+        day = Math.abs(day);
         // heurs
         hours = end.getHours() - start.getHours();
+        my_test("hours:"+hours+ "=" + end.getHours() + "-" + start.getHours());
         if (hours<0 && minus == "+") { day--; hours=24+hours}
-        if (hours>0 && minus == "-") { day++; hours=24-hours}
+        if (hours>0 && minus == "-") { day--; hours=24-hours}
+        hours = Math.abs(hours);
         // minute
         minute = end.getMinutes() - start.getMinutes();
+        my_test("minute:"+minute+ "=" + end.getMinutes() + "-" + start.getMinutes());
         if (minute<0 && minus == "+") { hours--; minute=60+minute}
-        if (minute>0 && minus == "-") { hours++; minute=60-minute}
+        if (minute>0 && minus == "-") { hours--; minute=60-minute}
+        minute = Math.abs(minute);
+        // seconde
         seconde = end.getSeconds() - start.getSeconds();
+        my_test("seconde:"+minute+ "=" + end.getSeconds() + "-" + start.getSeconds());
         if (seconde<0 && minus == "+") { minute--; seconde=60+seconde}
-        if (seconde>0 && minus == "-") { minute++; seconde=60-seconde}
+        if (seconde>0 && minus == "-") { minute--; seconde=60-seconde}
         
         return   minus+" "+Math.abs(year)+ " ans, "+Math.abs(month)+" mois, "+Math.abs(day)+" jour(s), "+Math.abs(hours)+" heur(s), "+Math.abs(minute)+" minute(s) et "+Math.abs(seconde) +" seconde(s)"; 
     }
@@ -243,7 +258,7 @@ init_calendar();
         ms = ms - (minute * (1000*60))
         // seconde
         seconde = Math.floor(ms / (1000));
-        return   minus+" "+day+" jour(s), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)";
+        return   minus+" "+day+" jour(s)("+Math.floor((day/7))+" semaine(s) et " + (day-Math.floor((day/7))) + " jour(s)), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)";
         // ,"Y M d //h:m:s"
 
     }
