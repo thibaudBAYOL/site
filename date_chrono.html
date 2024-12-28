@@ -220,19 +220,16 @@ init_calendar();
         day = Math.abs(day);
         // heurs
         hours = end.getHours() - start.getHours();
-        my_test("hours:"+hours+ "=" + end.getHours() + "-" + start.getHours());
         if (hours<0 && minus == "+") { day--; hours=24+hours}
         if (hours>0 && minus == "-") { day--; hours=24-hours}
         hours = Math.abs(hours);
         // minute
         minute = end.getMinutes() - start.getMinutes();
-        my_test("minute:"+minute+ "=" + end.getMinutes() + "-" + start.getMinutes());
         if (minute<0 && minus == "+") { hours--; minute=60+minute}
         if (minute>0 && minus == "-") { hours--; minute=60-minute}
         minute = Math.abs(minute);
         // seconde
         seconde = end.getSeconds() - start.getSeconds();
-        my_test("seconde:"+minute+ "=" + end.getSeconds() + "-" + start.getSeconds());
         if (seconde<0 && minus == "+") { minute--; seconde=60+seconde}
         if (seconde>0 && minus == "-") { minute--; seconde=60-seconde}
         
@@ -258,7 +255,7 @@ init_calendar();
         ms = ms - (minute * (1000*60))
         // seconde
         seconde = Math.floor(ms / (1000));
-        return   minus+" "+day+" jour(s)("+Math.floor((day/7))+" semaine(s) et " + (day-Math.floor((day/7))) + " jour(s)), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)";
+        return   minus+" "+day+" jour(s)("+Math.floor((day/7))+" semaine(s) et " + (day-(Math.floor((day/7))*7)) + " jour(s)), "+hours+" heur(s), "+minute+" minute(s) et "+seconde +" seconde(s)";
         // ,"Y M d //h:m:s"
 
     }
