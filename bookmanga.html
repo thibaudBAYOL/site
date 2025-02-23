@@ -20,7 +20,7 @@
         button {
             font-size: large;
             /*font-size: medium;*/
-            min-width: 100%;
+            min-width: 99%;
             min-height: 50px;
         }
         button:checked {
@@ -51,6 +51,7 @@
         }
 
         table {
+            max-width: 90%;
             border-collapse: collapse;
             background-color: lightgrey;
         }
@@ -103,6 +104,7 @@
         <button id="b_deco" onclick="show_nodel('co')">CONNECTION</button>
         <button id="add" onclick="show_nodel('f_add')">add</button>
         <button id="list" onclick="show_nodel('f_filter')">list</button>
+        <input id="immortal" type = "checkbox" onclick="my_view=this.checked">view?</input>
         <select id="key_word_next" >
             <option></option>
         </select>
@@ -259,6 +261,7 @@
     var update_id = undefined;
     var update_num_data = undefined;
     var confirm_sup = false;
+    var my_view = false
 
     var map_key_word_next = new Map;
 
@@ -339,7 +342,7 @@
             table_header += "<th>urls</th>";
             table_header += "<th>option</th>";
             //table_header += "<th> createdTime </th>";
-
+            table_header += "<th>view</th>";
             table_header += "<th>Last Modified</th>";
             table_header += "<th> update </th>";
             table_header += "<th> suprime </th>";
@@ -362,11 +365,11 @@
                 contenu += "<td  class=option value=\"" + element.fields.option + "\">";
                 contenu += element.fields.option;
                 contenu += "</td>";
-                /*
+                
                 contenu += "<td>";
-                contenu += element.createdTime;
+                contenu += (( my_view ) ? one_link(element.fields.urls) : "");
                 contenu += "</td>";
-                */
+                
                 contenu += "<td class=\"last_modif\">";
                     
                 if( element.fields['Last Modified'] === undefined) {
@@ -521,6 +524,21 @@
         var s = "";
         for (var i = 0; i < tab.length; i++) {
             s += "*<a href=" + tab[i] + " target=\"_blank\" >" + tab[i] + "</a></br>";
+        }
+        return s;
+    }
+
+    function one_link(urls) {
+
+        const tab = urls.split("\n");
+        var s = "";
+        if (tab.length> 0) {
+            if (tab[0].startsWith("https://drive.google.com/file/") || tab[0].toLowerCase().includes(".jpg") || tab[0].toLowerCase().includes(".jpeg") || tab[0].toLowerCase().includes(".png") || tab[0].toLowerCase().includes(".webp") || tab[0].toLowerCase().includes(".svg") || tab[0].toLowerCase().includes(".gif")|| tab[0].toLowerCase().includes(".avif") || tab[0].toLowerCase().includes(".apng") ) {
+                s += "<iframe src=\"" + tab[0] + "\"  allow=\"autoplay\" ></iframe>";
+                s += "<img src=\"" + tab[0] + "\" allow=\"autoplay\" height='100%' width='100%'></img>";
+            }else{
+                s += "no view";
+            }
         }
         return s;
     }
@@ -758,7 +776,7 @@
     if ((login = document.getElementById("login").value) != null && (mdp = document.getElementById("mdp").value) != null) {
         setCookie();
         myAirtable = new ApiAirtable(login, table, mdp);
-        myAirtableSpy = new ApiAirtable(login, "spy", mdp);
+        /*myAirtableSpy = new ApiAirtable(login, "spy", mdp);*/
         myAirtablekey = new ApiAirtable(login, "site_key", mdp);
         myapiJS = new ApiClient();
         /* try {
