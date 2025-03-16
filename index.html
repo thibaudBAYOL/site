@@ -302,11 +302,35 @@ Double click make full screen.</p>
                 date_ete = new Date(year, 5, 20);
                 date_automne = new Date(year, 8, 22);
                 date_hiver = new Date(year, 11, 21);
+                
+                date_noel = new Date(year, 12, 24);
+                date_noel_f = new Date(year, 12, 26);
+
+                date_1er_annee = new Date(year, 0, 1);
+                date_1er_annee_f = new Date(year, 0, 2);
+
+                date_1er_mai = new Date(year, 4, 1);
+                date_1er_mai_f = new Date(year, 4, 2);
+                
+                date_paque = DateOfEaster(date.getFullYear());
+                date_paque_f = new Date();
+                date_paque_f.setDate(date_paque.getDate()+1);
+                
 
                 saisson_now = "";
                 month = date.getMonth();
                 day = date.getDay();
-                if (between(date, date_printemps, date_ete)) {
+
+
+                if (between(date, date_paque,date_paque_f) ) {
+                    saisson_now = "./image/paque.png";
+                } else if (between(date, date_1er_mai,date_1er_mai_f) ) {
+                    saisson_now = "./image/1er_mai.png";
+                } else if (between(date, date_1er_annee,date_1er_annee_f) ) {
+                    saisson_now = "./image/1er_annee.png";
+                } else if (between(date, date_noel,date_noel_f) ) {
+                    saisson_now = "./image/noel.png";
+                } else if (between(date, date_printemps, date_ete)) {
                     if (between(day, 20, 21)) {
                         saisson_now = "./image/hiver_printemps.png";
                     } else {
@@ -331,6 +355,7 @@ Double click make full screen.</p>
                         saisson_now = "./image/hiver.png";
                     }
                 }
+
 
 
                 document.getElementsByTagName("html")[0].style.backgroundImage = "url(" + saisson_now + ")";
@@ -374,6 +399,34 @@ Double click make full screen.</p>
                 document.getElementById(id).style.display='none'
             }
             
+
+                    
+        //https://www.gladir.com/CODER/JAVASCRIPT/dateofeaster.htm
+        function DateOfEaster(year) {
+            var month,day;
+            var g,c,x,z,d,e,n;
+            g = Math.floor(year % 19) + 1;
+            c = Math.floor(year / 100) + 1;
+            x = Math.floor((3 * c) / 4) - 12;
+            z = Math.floor((8 * c + 5) / 25) - 5;
+            d = Math.floor((5 * year) / 4) - x - 10;
+            e = Math.floor(11 * g + 20 + z - x) % 30;
+            if(e < 0) e += 30;
+            if(((e == 25) && (g > 11)) || (e == 24)) e++;
+            n = 44 - e;
+            if(n < 21) n += 30;
+            n = n + 7 - ((d + n) % 7);
+            if(n > 31) {
+                month = 4;
+                day = n - 31;
+            } else {
+                month = 3;
+                day = n;
+            }
+            console.log( year + "/" + (month-1) + "/" + day)
+            return new Date(year,month-1,day);
+        } 
+
 
         </script>
 
