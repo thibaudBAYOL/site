@@ -203,35 +203,42 @@ init_calendar();
             minus ="+";
         }
 
-        year = end.getFullYear() - start.getFullYear();
-        year = Math.abs(year)
-        // mois
-        month = (end.getMonth()+1) - (start.getMonth()+1);
-
-        if (month<0 && minus == "+") { year--; month=12+month}
-        if (month>0 && minus == "-") { year--; month=12-month}
-
-        month = Math.abs(month)
-        // jour
-        day = end.getDate() - start.getDate();
-        if (day<0 && minus == "+") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())+day}
-        if (day>0 && minus == "-") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())-day}
-
-        day = Math.abs(day);
-        // heurs
-        hours = end.getHours() - start.getHours();
-        if (hours<0 && minus == "+") { day--; hours=24+hours}
-        if (hours>0 && minus == "-") { day--; hours=24-hours}
-        hours = Math.abs(hours);
-        // minute
-        minute = end.getMinutes() - start.getMinutes();
-        if (minute<0 && minus == "+") { hours--; minute=60+minute}
-        if (minute>0 && minus == "-") { hours--; minute=60-minute}
-        minute = Math.abs(minute);
         // seconde
         seconde = end.getSeconds() - start.getSeconds();
-        if (seconde<0 && minus == "+") { minute--; seconde=60+seconde}
-        if (seconde>0 && minus == "-") { minute--; seconde=60-seconde}
+        minute = 0;
+        if (seconde<0 && minus == "+") { minute--; seconde=60+seconde;}
+        if (seconde>0 && minus == "-") { minute++; seconde=60-seconde;}
+        
+        // minute
+        minute = end.getMinutes() - start.getMinutes() + minute;
+        hours = 0;
+        if (minute<0 && minus == "+") { hours--; minute=60+minute;}
+        if (minute>0 && minus == "-") { hours++; minute=60-minute;}
+        minute = Math.abs(minute);
+
+        // heurs
+        hours = end.getHours() - start.getHours() + hours;
+        day = 0;
+        if (hours<0 && minus == "+") { day--; hours=24+hours;}
+        if (hours>0 && minus == "-") { day++; hours=24-hours;}
+        hours = Math.abs(hours);
+        
+        // jour
+        day = end.getDate() - start.getDate() + day;
+        month = 0;
+        if (day<0 && minus == "+") { month--; day=daysInMonth(end.getFullYear(),end.getMonth())+day;}
+        if (day>0 && minus == "-") { month++; day=daysInMonth(end.getFullYear(),end.getMonth())-day;}
+        day = Math.abs(day);
+
+        // mois
+        month = (end.getMonth()+1) - (start.getMonth()+1) + month;
+        year = 0;
+        if (month<0 && minus == "+") { year--; month=12+month;}
+        if (month>0 && minus == "-") { year++; month=12-month;}
+        month = Math.abs(month);
+
+        year = end.getFullYear() - start.getFullYear() + year;
+        year = Math.abs(year);
         
         return   minus+" "+Math.abs(year)+ " ans, "+Math.abs(month)+" mois, "+Math.abs(day)+" jour(s), "+Math.abs(hours)+" heur(s), "+Math.abs(minute)+" minute(s) et "+Math.abs(seconde) +" seconde(s)"; 
     }
@@ -261,7 +268,11 @@ init_calendar();
     }
 
     //update();
-    setInterval(update,1000);
+    var id = setInterval(update,1000);
+
+    function stop(){
+        clearInterval(id);
+    }
 
     function my_test(msg){
         if(test) console.log(msg);
