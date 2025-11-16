@@ -313,9 +313,8 @@ Double click make full screen.</p>
                 date_1er_mai_f = new Date(year, 4, 2);
                 
                 date_paque = DateOfEaster(date.getFullYear());
-                date_paque_f = new Date();
-                date_paque_f.setDate(date_paque.getDate()+1);
-                
+                date_paque_f = new Date(date_paque);
+                date_paque_f.setDate(date_paque_f.getDate()+1);
 
                 saisson_now = "";
                 month = date.getMonth();
