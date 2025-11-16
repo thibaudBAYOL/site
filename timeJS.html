@@ -11,9 +11,9 @@
 <body>
     <button onclick="hidden_date()">hidden</button>
     <input style=" height: 20; background-color: yellow;" type="number" id="interval" value="1000"
-        onchange="interval = document.getElementById('interval').value; re_start();">
+        onchange="interval = document.getElementById('interval').value; re_start();setCookie();">
     <input style=" height: 20; background-color: yellow;" type="time" id="heure" value="17:00"
-        onchange="heure = document.getElementById('heure').value;console.log(heure); re_start();">
+        onchange="heure = document.getElementById('heure').value;console.log(heure); re_start();setCookie();">
 
     <div id="time0" style=" background-color: pink;">
         <!--h1  id="time" style="height: 50; font-size:50;  background-color: blue;"></h1  width: 770px; height: 920px; // -->
@@ -70,7 +70,9 @@
 <script async>
     interval = 1000;
     heure = "17:00";
-    document.getElementById('interval').value = 1000;
+    getCookie();
+    document.getElementById('interval').value = interval;
+    document.getElementById('heure').value = heure;
 
     espace = document.getElementById("espace");
 
@@ -134,7 +136,7 @@
     }
 
     get_time();
-    id = time_start(1000);
+    id = time_start();
     time0.addEventListener("click", function () {
         if (pause == false) {
             pause = true;
@@ -142,7 +144,7 @@
             clearInterval(id);
             console.log("PAUSE");
         } else {
-            id = time_start(1000);
+            id = time_start();
             pause = false;
             document.getElementById("titre").innerHTML = "TIME";
             console.log("START");
@@ -240,6 +242,41 @@
         seconds = (seconds < 10) ? "0" + seconds : seconds;
 
         return minus + hours + ":" + minutes + ":" + seconds + ":" + milliseconds;
+    }
+
+    function getCookie(){
+        // lire le cookie (login mdp)
+        if (!document.cookie.includes("myCookie=")) {
+                console.log("ADD " + document.cookie);
+        } else {
+                console.log("document.cookie lecture");
+                tab_cookies = document.cookie.split("; ");
+                tab_cookies.forEach(element => {
+                    if (element.startsWith("myCookie=")) {
+                        json = JSON.parse(element.replace("myCookie=", ""));
+                        interval = json.interval;
+                        heure = json.heure;
+                    }
+                });
+        }
+        setCookie();
+    }
+
+    var date = new Date();
+        date.setDate(date.getDate() + 365);
+        date = date.toUTCString();
+        console.log(date);
+
+    function setCookie() {
+            console.log("setCookie()");
+            //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
+            if (document.getElementById("interval").value != "" && document.getElementById("heure").value != ""){
+            json = { "interval": interval , "heure": heure };
+        
+            let co = "myCookie=" + JSON.stringify(json) + "; expires=" + date + " ; samesite=strict";
+            console.log("setCookie:" + co);
+            document.cookie = co;
+            }
     }
 
 </script>
