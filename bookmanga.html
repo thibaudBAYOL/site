@@ -403,7 +403,8 @@
             }
             document.getElementById(id_data).innerHTML = "<table>" + table_header + contenu + "</table>" + my_next + "<h3>count=" + rep.records.length + "</h3>";
         } else {
-            document.getElementById(id_data).innerHTML = "<h3>NO FOUND</h3>"
+            document.getElementById(id_data).innerHTML = "<h3>NO FOUND</h3>";
+            log(rep);
         }
     }
 
