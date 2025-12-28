@@ -775,9 +775,9 @@
 
     if ((login = document.getElementById("login").value) != null && (mdp = document.getElementById("mdp").value) != null) {
         setCookie();
-        myAirtable = new ApiAirtable(login, table, mdp);
+        //myAirtable = new ApiAirtable(login, table, mdp);
         /*myAirtableSpy = new ApiAirtable(login, "spy", mdp);*/
-        myAirtablekey = new ApiAirtable(login, "site_key", mdp);
+        //myAirtablekey = new ApiAirtable(login, "site_key", mdp);
         myapiJS = new ApiClient();
         /* try {
              
@@ -802,7 +802,7 @@
 
         //myAirtableSpy.addAirtable([{ 'fields': { 'info': titre, 'IP': lien} }]).then(log);
 
-
+/*
         myAirtablekey.getAirtable(null,"").then(function(rep){
             key_word_next = document.getElementById("key_word_next");
             //key_word_next.innerHTML="";
@@ -819,7 +819,7 @@
 
             });
         });
-
+*/
 
         hidden_nodel("co");
     }
