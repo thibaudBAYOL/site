@@ -47,11 +47,14 @@
         }
 
         #data td {
+            word-break: break-word;
             font-size: x-large;
         }
 
         table {
-            max-width: 90%;
+            width: 90%;
+            table-layout: fixed;
+            word-break: break-word;
             border-collapse: collapse;
             background-color: lightgrey;
         }
@@ -539,7 +542,7 @@
         var s = "";
         if (tab.length> 0) {
             if (tab[0].startsWith("https://drive.google.com/file/") || tab[0].toLowerCase().includes(".jpg") || tab[0].toLowerCase().includes(".jpeg") || tab[0].toLowerCase().includes(".png") || tab[0].toLowerCase().includes(".webp") || tab[0].toLowerCase().includes(".svg") || tab[0].toLowerCase().includes(".gif")|| tab[0].toLowerCase().includes(".avif") || tab[0].toLowerCase().includes(".apng") ) {
-                s += "<iframe src=\"" + tab[0] + "\"  allow=\"autoplay\" ></iframe>";
+                s += "<iframe src=\"" + tab[0] + "\"  allow=\"autoplay\" height='100%' width='100%' ></iframe>";
                 s += "<img src=\"" + tab[0] + "\" allow=\"autoplay\" height='100%' width='100%'></img>";
             }else{
                 s += "no view";
