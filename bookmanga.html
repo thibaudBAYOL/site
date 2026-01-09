@@ -334,6 +334,10 @@
     modif : permet de modifier
     */
     function print_table_param(rep,id_data,modif) {
+        if (rep.records === undefined){
+            log(rep);
+            return;
+        }
         if (rep.records.length >= 1) {
             table_header = "<tr>";
 
