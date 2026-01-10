@@ -107,7 +107,7 @@
         <button id="b_deco" onclick="show_nodel('co')">CONNECTION</button>
         <button id="add" onclick="show_nodel('f_add')">add</button>
         <button id="list" onclick="show_nodel('f_filter')">list</button>
-        <input id="immortal" type = "checkbox" onclick="my_view=this.checked">view?</input>
+        <input id="my_view" type = "checkbox" onclick="my_view=this.checked;setCookie();">view?</input>
         <select id="key_word_next" >
             <option></option>
         </select>
@@ -723,7 +723,7 @@
             console.log("setCookie()");
             //document.cookie = "XXXX; path="+path+"; expires=" + date + "; samesite=strict";
             if (document.getElementById("login").value != "" && document.getElementById("mdp").value != ""){
-            json = { "login": document.getElementById("login").value , "mdp": document.getElementById("mdp").value };
+            json = { "login": document.getElementById("login").value , "mdp": document.getElementById("mdp").value,"view": my_view };
         
             let co = "myCookie=" + JSON.stringify(json) + "; expires=" + date + " ; samesite=strict";
             console.log("setCookie:" + co);
@@ -772,6 +772,8 @@
                         json = JSON.parse(element.replace("myCookie=", ""));
                         document.getElementById("login").value = json.login;
                         document.getElementById("mdp").value = json.mdp;
+                        document.getElementById("my_view").checked = json.my_view ?? false;
+                        my_view = json.my_view ?? false;
                     }
                 });
         }
