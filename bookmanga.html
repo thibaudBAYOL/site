@@ -239,6 +239,7 @@
     <p>data3</p>
     <div id="data3"></div>
 
+    <div id="notif" style=" position: fixed; top: 20px; right: 20px; background: #74f9ec; color: rgb(255, 0, 0); padding: 10px 15px; border-radius: 5px; display: none; "> Notification ! </div>
 </body>
 
 <script>
@@ -260,6 +261,7 @@
     var map_key_word_next = new Map;
 
     function b_add() {
+        showNotif("Add ..");
         //titre // add_option // lien
         const titre = document.getElementById("titre").value;
         const add_option = document.getElementById("add_option").value;
@@ -333,6 +335,7 @@
             return;
         }
         if (rep.records.length >= 1) {
+            showNotif("SHOW OK " + id_data);
             table_header = "<tr>";
 
 
@@ -417,6 +420,7 @@
     }
 
     function my_updateAirtable(data){
+        showNotif("Update...");
         switch (update_num_data) {
             case "data":
                 myAirtable.updateAirtable(data).then(log_and_update_in);
@@ -866,12 +870,10 @@
         my_view=document.getElementById("my_view").checked;
         setCookie();
         console.log(my_view);
-        if (my_view) {
-            console.log(my_view);
-            add_photo(document.getElementById("data"));
-            add_photo(document.getElementById("data2"));
-            add_photo(document.getElementById("data3"));
-        }
+        console.log(my_view);
+        add_photo(document.getElementById("data"));
+        add_photo(document.getElementById("data2"));
+        add_photo(document.getElementById("data3"));
         
     }
 
@@ -889,7 +891,7 @@
                 console.log(e.getElementsByClassName("lien")[index]);
                 urls = e.getElementsByClassName("lien")[index].attributes[1].value;
                 console.log("list tr = urls:" + urls);
-                e.getElementsByClassName("photo")[index].innerHTML = one_link(urls);
+                e.getElementsByClassName("photo")[index].innerHTML = (( my_view ) ? one_link(urls) : "");
             }
         }
         /*
@@ -907,6 +909,7 @@
             return;
         }
         if (my_rep.records.length >= 1) {
+            showNotif("UPDATE OK");
             // recuperer l'id
             my_rep.records.forEach(element => {
                 elem_id = document.getElementById(element.id);
@@ -948,6 +951,7 @@
             return;
         }
         if (rep.records.length >= 1) {
+            showNotif("ADD OK");
             if (document.getElementById(id_data).innerHTML == "") {
                 print_table_param(rep,id_data,modif);
             }else{
@@ -1015,6 +1019,12 @@
         add_in(rep,"data",true);
     }
     
+    function showNotif(msg) { 
+        const n = document.getElementById("notif"); 
+        n.innerText = msg;
+        n.style.display = "block"; 
+        setTimeout(() => { n.style.display = "none"; }, 1000); 
+    }
 
 </script>
 
