@@ -231,21 +231,13 @@
 
     </div>
 
-    <div id="info">
+    <div id="info"></div>
 
-    </div>
-
-    <div id="data">
-
-    </div>
+    <div id="data"></div>
     <p>data2</p>
-    <div id="data2">
-
-    </div>
+    <div id="data2"></div>
     <p>data3</p>
-    <div id="data3">
-
-    </div>
+    <div id="data3"></div>
 
 </body>
 
@@ -272,7 +264,7 @@
         const titre = document.getElementById("titre").value;
         const add_option = document.getElementById("add_option").value;
         const lien = document.getElementById("lien").value;
-        myAirtable.addAirtable([{ 'fields': { 'Name': titre, 'urls': lien, 'option': add_option } }]).then(log);
+        myAirtable.addAirtable([{ 'fields': { 'Name': titre, 'urls': lien, 'option': add_option } }]).then(log_and_add_in);
     }
 
     function b_search() {
@@ -950,7 +942,79 @@
         log(rep);
         update_in(rep);
     }
+    function add_in(rep,id_data,modif){
+        console.log(rep);
+        if (rep.records === undefined){
+            return;
+        }
+        if (rep.records.length >= 1) {
+            if (document.getElementById(id_data).innerHTML == "") {
+                print_table_param(rep,id_data,modif);
+            }else{
+            // recuperer la table data
+            contenu = "";
+            rep.records.forEach(element => {
 
+                contenu += "<tr title=" + element.id + " id=" + element.id + " >";
+
+                contenu += "<td class=titre >";
+                contenu += many_title(element.fields.Name);
+                contenu += "</td>";
+
+                contenu += "<td class=lien value=\"" + element.fields.urls + "\">";
+                contenu += many_link(element.fields.urls);
+                contenu += "</td>";
+
+
+                contenu += "<td  class=option >";
+                contenu += element.fields.option;
+                contenu += "</td>";
+                
+                contenu += "<td class=photo>";
+                contenu += (( my_view ) ? one_link(element.fields.urls) : "");
+                contenu += "</td>";
+                
+                contenu += "<td class=\"last_modif\">";
+
+                if( element.fields['Last Modified'] === undefined) {
+                    contenu += "";
+                } else  {
+                    contenu += element.fields['Last Modified'].replace(":", ":<pre>");
+                }
+                contenu += "</br>(add)" + new Date();
+                
+                contenu += "</td>";
+                contenu += "<td>";
+                if (modif) {
+                contenu += "<button onclick=\"update('" + element.id + "','" + id_data + "')\">M</button>";
+                }
+                contenu += "</td>";
+
+                contenu += "<td>";
+                if (modif) {
+                  contenu += "<button onclick=\"sup('" + element.id + "','" + element.fields.Name.split("\n")[0].replace(/[',"]/g, "\\'") + "','" + id_data + "')\">M</button>";  
+                }
+                contenu += "</td>";
+                if (modif) {
+                contenu += "<td ><div class=retour ></div><button onclick=\"search_button('"+ element.id +"')\">S</button><button onclick=\"search_button_direct('"+ element.id +"')\">D</button></td>";
+                }
+                contenu += "</tr>";
+
+                }
+
+            )
+            
+            document.getElementById(id_data).getElementsByTagName("table")[0].innerHTML += contenu;
+            }
+            console.log("add in end:"+contenu);
+        }
+        
+    }
+    function log_and_add_in(rep){
+        log(rep);
+        add_in(rep,"data",true);
+    }
+    
 
 </script>
 
