@@ -10,7 +10,6 @@
     <style>
         html {
             background-color: gray;
-
         }
 
         * {
@@ -107,7 +106,7 @@
         <button id="b_deco" onclick="show_nodel('co')">CONNECTION</button>
         <button id="add" onclick="show_nodel('f_add')">add</button>
         <button id="list" onclick="show_nodel('f_filter')">list</button>
-        <input id="my_view" type = "checkbox" onclick="my_view=this.checked;setCookie();">view?</input>
+        <input id="my_view" type = "checkbox" onclick="my_view_change();">view?</input>
         <select id="key_word_next" >
             <option></option>
         </select>
@@ -217,7 +216,7 @@
                             required></textarea>
                         <button class="w3-bar w3-green" onclick="up_option()">M</button>
                     </div>
-
+                    <button class="w3-bar w3-green" onclick="up_option_lien()">MM</button>
                     <input id="search_button_input" placeholder="search_button"/>
 
                 </div>
@@ -360,7 +359,7 @@
             rep.records.forEach(element => {
                 contenu += "<tr title=" + element.id + " id=" + element.id + " >";
 
-                contenu += "<td class=titre value=\"" + element.fields.Name + "\">";
+                contenu += "<td class=titre >";
                 contenu += many_title(element.fields.Name);
                 contenu += "</td>";
 
@@ -369,11 +368,11 @@
                 contenu += "</td>";
 
 
-                contenu += "<td  class=option value=\"" + element.fields.option + "\">";
+                contenu += "<td  class=option >";
                 contenu += element.fields.option;
                 contenu += "</td>";
                 
-                contenu += "<td>";
+                contenu += "<td class=photo>";
                 contenu += (( my_view ) ? one_link(element.fields.urls) : "");
                 contenu += "</td>";
                 
@@ -428,13 +427,13 @@
     function my_updateAirtable(data){
         switch (update_num_data) {
             case "data":
-                myAirtable.updateAirtable(data).then(log);
+                myAirtable.updateAirtable(data).then(log_and_update_in);
                 break;
             case "data2":
-                myAirtable2.updateAirtable(data).then(log);
+                myAirtable2.updateAirtable(data).then(log_and_update_in);
                 break;
             case "data3":
-                myAirtable3.updateAirtable(data).then(log);
+                myAirtable3.updateAirtable(data).then(log_and_update_in);
                 break;
             default:
                 console.log("update_num_data inconnu");
@@ -464,11 +463,11 @@
         update_num_data = num_data;
         document.getElementById("up_id").innerHTML = id;
         show_nodel("update")
-        titre = document.getElementById(id).getElementsByClassName("titre")[0].attributes[1].value;
+        titre = document.getElementById(id).getElementsByClassName("titre")[0].innerText;
         document.getElementById("up_titre").value = titre;
         lien = document.getElementById(id).getElementsByClassName("lien")[0].attributes[1].value;
         document.getElementById("up_lien").value = lien;
-        option = document.getElementById(id).getElementsByClassName("option")[0].attributes[1].value;
+        option = document.getElementById(id).getElementsByClassName("option")[0].innerHTML;
         document.getElementById("up_option").value = option;
         //my_updateAirtable([{'id':id,'fields':{ 'Name': titre, 'urls': lien, 'option': add_option }}]);
     }
@@ -477,6 +476,13 @@
         titre = document.getElementById("up_titre").value;
         my_updateAirtable([{ 'id': update_id, 'fields': { 'Name': titre } }]);
     }
+
+    function up_option_lien(){
+        option = document.getElementById("up_option").value;
+        lien = document.getElementById("up_lien").value;
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien, 'option': option } }]);
+    }
+
     function up_lien() {
         lien = document.getElementById("up_lien").value;
         my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]);
@@ -497,15 +503,16 @@
         d= new Date();
         option = option + " \n " + d.toString();
         console.log("test " + option);
-        my_updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]);
+        
         lien = document.getElementById("up_lien").value;
         if(lien.endsWith("1")){
             lien = lien + ".";
         } else{
             lien = lien + " \n 1";
         }
-        
-        my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]);
+        my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien, 'option': option } }]);
+        //my_updateAirtable([{ 'id': update_id, 'fields': { 'urls': lien } }]);
+        //my_updateAirtable([{ 'id': update_id, 'fields': { 'option': option } }]);
     }
 
     function up_stop() {
@@ -862,7 +869,87 @@
         document.getElementById("login").value = document.getElementById("log").value;
     }
 
-    
+    function my_view_change(){
+
+        my_view=document.getElementById("my_view").checked;
+        setCookie();
+        console.log(my_view);
+        if (my_view) {
+            console.log(my_view);
+            add_photo(document.getElementById("data"));
+            add_photo(document.getElementById("data2"));
+            add_photo(document.getElementById("data3"));
+        }
+        
+    }
+
+    function add_photo(e){
+        console.log("add_photo");
+        var list = e.getElementsByTagName("tr");
+        if (list != null) {
+            console.log("list tr:" + list + " " + list.length);
+            console.log(list);
+            var urls = "";
+            console.log(e.getElementsByClassName("lien"));
+            for (let index = 0; index < list.length-1; index++) {
+                //list[index]
+                console.log("list index" + index);
+                console.log(e.getElementsByClassName("lien")[index]);
+                urls = e.getElementsByClassName("lien")[index].attributes[1].value;
+                console.log("list tr = urls:" + urls);
+                e.getElementsByClassName("photo")[index].innerHTML = one_link(urls);
+            }
+        }
+        /*
+            <tr>
+                class=lien
+                class=photo
+                urls = one_link(element.fields.urls) : "");
+        */
+    }
+
+    function update_in(my_rep){
+        console.log("update_in start");
+        console.log(my_rep);
+        if (my_rep.records === undefined){
+            return;
+        }
+        if (my_rep.records.length >= 1) {
+            // recuperer l'id
+            my_rep.records.forEach(element => {
+                elem_id = document.getElementById(element.id);
+                console.log("elem_id");
+                console.log(elem_id);
+                
+                console.log(element.fields.urls)
+                if (element.fields.urls !== undefined) {
+                    console.log("urls update");
+                    elem_id.getElementsByClassName("lien")[0].attributes[1].value = element.fields.urls;
+                    elem_id.getElementsByClassName("lien")[0].innerHTML = many_link(element.fields.urls);
+                }
+                console.log(element.fields.option)
+                if (element.fields.option !== undefined) {
+                    elem_id.getElementsByClassName("option")[0].innerText = element.fields.option;
+                    elem_id.getElementsByClassName("photo")[0].innerHTML = (( my_view ) ? one_link(element.fields.urls) : "");
+                }
+                //last_modif
+                elem_id.getElementsByClassName("last_modif")[0].innerHTML += "</br>(modif)" + new Date();
+
+                if (element.fields.Name !== undefined) {
+                    elem_id.getElementsByClassName("titre")[0].innerHTML = element.fields.Name
+                }
+
+                }
+
+            )
+            console.log("update in end");
+        }
+    }
+
+    function log_and_update_in(rep){
+        log(rep);
+        update_in(rep);
+    }
 
 
 </script>
