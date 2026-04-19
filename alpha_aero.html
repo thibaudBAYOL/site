@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<!--Use of Manus (https://manus.im/app) for first code generation-->
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Aéronautique - Quiz Interactif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Tableau de l'alphabet */
+        .alphabet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .alphabet-table thead {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .alphabet-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .alphabet-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .alphabet-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .letter-cell {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #667eea;
+        }
+
+        .name-cell {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .image-cell {
+            text-align: center;
+        }
+
+        .image-cell img {
+            max-width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        /* Section Quiz */
+        .quiz-section {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+
+        .quiz-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #38a169;
+        }
+
+        .btn-danger {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e53e3e;
+        }
+
+        .btn-secondary {
+            background-color: #cbd5e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #a0aec0;
+        }
+
+        .quiz-display {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-display.active {
+            display: block;
+        }
+
+        .quiz-letter {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .quiz-image {
+            max-width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin: 20px 0;
+        }
+
+        .quiz-input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .quiz-input-group input {
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            width: 200px;
+            text-transform: uppercase;
+        }
+
+        .quiz-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .feedback.incorrect {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #f56565;
+        }
+
+        /* Statistiques */
+        .stats-section {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #764ba2;
+        }
+
+        .global-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .stat-percentage {
+            font-size: 1rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .letter-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .letter-stat {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-top: 4px solid #ddd;
+        }
+
+        .letter-stat.good {
+            border-top-color: #48bb78;
+        }
+
+        .letter-stat.medium {
+            border-top-color: #f6ad55;
+        }
+
+        .letter-stat.poor {
+            border-top-color: #f56565;
+        }
+
+        .letter-stat-letter {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .letter-stat-name {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .letter-stat-score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background-color: #f56565;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background-color: #e53e3e;
+        }
+
+        .no-stats {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .alphabet-table th,
+            .alphabet-table td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .quiz-letter {
+                font-size: 3rem;
+            }
+
+            .quiz-input-group input {
+                width: 150px;
+            }
+
+            .letter-stats {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>✈️ Alphabet Aéronautique</h1>
+            <p>Apprenez et testez vos connaissances de l'alphabet radio international (OACI)</p>
+        </header>
+
+        <div class="content">
+            <!-- Section Tableau -->
+            <div class="section">
+                <h2>📚 Tableau de l'Alphabet</h2>
+                <table class="alphabet-table">
+                    <thead>
+                        <tr>
+                            <th>Lettre</th>
+                            <th>Nom Aéronautique</th>
+                            <th>Image</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alphabet-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section Quiz -->
+            <div class="section">
+                <h2>🎯 Quiz Interactif</h2>
+                <div class="quiz-section">
+                    <div class="quiz-controls">
+                        <button class="btn-primary" id="btn-start-quiz">Démarrer le Quiz</button>
+                        <button class="btn-secondary" id="btn-stop-quiz" style="display: none;">Arrêter le Quiz</button>
+                    </div>
+
+                    <div class="quiz-display" id="quiz-display">
+                        <p style="color: #999; margin-bottom: 10px;">Quel est le nom aéronautique de cette lettre ?</p>
+                        <div class="quiz-letter" id="quiz-letter"></div>
+                        <img class="quiz-image" id="quiz-image" alt="Image de la lettre">
+                        <div class="quiz-input-group">
+                            <input type="text" id="quiz-input" placeholder="Entrez la réponse..." autocomplete="off">
+                            <button class="btn-success" id="btn-submit-answer">Valider</button>
+                        </div>
+                        <div class="feedback" id="feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Statistiques -->
+            <div class="section">
+                <h2>📊 Statistiques</h2>
+                <div class="stats-section">
+                    <div class="global-stats" id="global-stats">
+                        <div class="no-stats">Aucune statistique pour le moment. Commencez un quiz !</div>
+                    </div>
+                    <div id="letter-stats-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données de l'alphabet aéronautique
+        const alphabet = [
+            { letter: 'A', name: 'Alfa', image: '🐺' },
+            { letter: 'B', name: 'Bravo', image: '🎉' },
+            { letter: 'C', name: 'Charlie', image: '🎬' },
+            { letter: 'D', name: 'Delta', image: '🔺' },
+            { letter: 'E', name: 'Echo', image: '🔊' },
+            { letter: 'F', name: 'Foxtrot', image: '🦊' },
+            { letter: 'G', name: 'Golf', image: '⛳' },
+            { letter: 'H', name: 'Hotel', image: '🏨' },
+            { letter: 'I', name: 'India', image: '🇮🇳' },
+            { letter: 'J', name: 'Juliet', image: '💕' },
+            { letter: 'K', name: 'Kilo', image: '⚖️' },
+            { letter: 'L', name: 'Lima', image: '🍋' },
+            { letter: 'M', name: 'Mike', image: '🎤' },
+            { letter: 'N', name: 'November', image: '🍂' },
+            { letter: 'O', name: 'Oscar', image: '🏆' },
+            { letter: 'P', name: 'Papa', image: '👨' },
+            { letter: 'Q', name: 'Quebec', image: '🍁' },
+            { letter: 'R', name: 'Romeo', image: '💑' },
+            { letter: 'S', name: 'Sierra', image: '⛰️' },
+            { letter: 'T', name: 'Tango', image: '💃' },
+            { letter: 'U', name: 'Uniform', image: '👔' },
+            { letter: 'V', name: 'Victor', image: '✌️' },
+            { letter: 'W', name: 'Whiskey', image: '🥃' },
+            { letter: 'X', name: 'X-ray', image: '🩻' },
+            { letter: 'Y', name: 'Yankee', image: '🇺🇸' },
+            { letter: 'Z', name: 'Zulu', image: '⏰' }
+        ];
+
+        // Initialisation
+        let quizActive = false;
+        let currentQuizLetter = null;
+        let stats = {};
+
+        // Charger les statistiques depuis les cookies
+        function loadStats() {
+            const cookieValue = document.cookie.split('; ').find(row => row.startsWith('alphabet_stats='));
+            if (cookieValue) {
+                try {
+                    stats = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+                } catch (e) {
+                    stats = {};
+                }
+            }
+            // Initialiser les lettres non présentes
+            alphabet.forEach(item => {
+                if (!stats[item.letter]) {
+                    stats[item.letter] = { correct: 0, total: 0 };
+                }
+            });
+        }
+
+        // Sauvegarder les statistiques dans les cookies
+        function saveStats() {
+            const expirationDate = new Date();
+            expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+            document.cookie = `alphabet_stats=${encodeURIComponent(JSON.stringify(stats))}; expires=${expirationDate.toUTCString()}; path=/`;
+        }
+
+        // Remplir le tableau
+        function populateAlphabet() {
+            const tbody = document.getElementById('alphabet-tbody');
+            alphabet.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="letter-cell">${item.letter}</td>
+                    <td class="name-cell">${item.name}</td>
+                    <td class="image-cell">${item.image}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Démarrer le quiz
+        document.getElementById('btn-start-quiz').addEventListener('click', () => {
+            quizActive = true;
+            document.getElementById('btn-start-quiz').style.display = 'none';
+            document.getElementById('btn-stop-quiz').style.display = 'inline-block';
+            document.getElementById('quiz-display').classList.add('active');
+            showNextQuestion();
+        });
+
+        // Arrêter le quiz
+        document.getElementById('btn-stop-quiz').addEventListener('click', () => {
+            quizActive = false;
+            document.getElementById('btn-start-quiz').style.display = 'inline-block';
+            document.getElementById('btn-stop-quiz').style.display = 'none';
+            document.getElementById('quiz-display').classList.remove('active');
+            document.getElementById('quiz-input').value = '';
+            document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+        });
+
+        // Afficher la prochaine question
+        function showNextQuestion() {
+            if (!quizActive) return;
+            const randomIndex = Math.floor(Math.random() * alphabet.length);
+            currentQuizLetter = alphabet[randomIndex];
+            document.getElementById('quiz-letter').textContent = currentQuizLetter.letter;
+            document.getElementById('quiz-image').textContent = currentQuizLetter.image;
+            document.getElementById('quiz-input').value = '';
+            document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+            document.getElementById('quiz-input').focus();
+        }
+
+        // Valider la réponse
+        document.getElementById('btn-submit-answer').addEventListener('click', validateAnswer);
+        document.getElementById('quiz-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') validateAnswer();
+        });
+
+        function validateAnswer() {
+            if (!quizActive || !currentQuizLetter) return;
+
+            const userAnswer = document.getElementById('quiz-input').value.trim().toUpperCase();
+            const correctAnswer = currentQuizLetter.name.toUpperCase();
+            const feedback = document.getElementById('feedback');
+
+            stats[currentQuizLetter.letter].total++;
+
+            if (userAnswer === correctAnswer) {
+                stats[currentQuizLetter.letter].correct++;
+                feedback.textContent = `✓ Correct ! ${currentQuizLetter.name} est la bonne réponse.`;
+                feedback.classList.add('correct');
+            } else {
+                feedback.textContent = `✗ Incorrect. La bonne réponse est : ${currentQuizLetter.name}`;
+                feedback.classList.add('incorrect');
+            }
+
+            feedback.classList.add('show');
+            saveStats();
+            updateStats();
+
+            setTimeout(() => {
+                showNextQuestion();
+            }, 2000);
+        }
+
+        // Mettre à jour les statistiques affichées
+        function updateStats() {
+            let totalAttempts = 0;
+            let totalCorrect = 0;
+
+            Object.values(stats).forEach(stat => {
+                totalAttempts += stat.total;
+                totalCorrect += stat.correct;
+            });
+
+            if (totalAttempts === 0) {
+                document.getElementById('global-stats').innerHTML = '<div class="no-stats">Aucune statistique pour le moment. Commencez un quiz !</div>';
+                return;
+            }
+
+            const globalPercentage = Math.round((totalCorrect / totalAttempts) * 100);
+
+            document.getElementById('global-stats').innerHTML = `
+                <div class="stat-card">
+                    <h3>Tentatives Totales</h3>
+                    <div class="stat-value">${totalAttempts}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Bonnes Réponses</h3>
+                    <div class="stat-value">${totalCorrect}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Taux de Réussite</h3>
+                    <div class="stat-value">${globalPercentage}%</div>
+                </div>
+            `;
+
+            // Statistiques par lettre
+            let letterStatsHTML = '<h3 style="margin-bottom: 15px; color: #667eea;">Résultats par Lettre</h3><div class="letter-stats">';
+
+            alphabet.forEach(item => {
+                const stat = stats[item.letter];
+                const percentage = stat.total === 0 ? 0 : Math.round((stat.correct / stat.total) * 100);
+                let statusClass = 'good';
+                if (percentage < 50 && stat.total > 0) statusClass = 'poor';
+                else if (percentage < 75 && stat.total > 0) statusClass = 'medium';
+
+                letterStatsHTML += `
+                    <div class="letter-stat ${statusClass}">
+                        <div class="letter-stat-letter">${item.letter}</div>
+                        <div class="letter-stat-name">${item.name}</div>
+                        <div class="letter-stat-score">${stat.correct}/${stat.total}</div>
+                        <div class="letter-stat-score" style="font-size: 0.9rem; color: #999;">${percentage}%</div>
+                    </div>
+                `;
+            });
+
+            letterStatsHTML += '</div><button class="reset-btn" id="btn-reset-stats">Réinitialiser les Statistiques</button>';
+            document.getElementById('letter-stats-container').innerHTML = letterStatsHTML;
+
+            document.getElementById('btn-reset-stats').addEventListener('click', resetStats);
+        }
+
+        // Réinitialiser les statistiques
+        function resetStats() {
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les statistiques ?')) {
+                stats = {};
+                alphabet.forEach(item => {
+                    stats[item.letter] = { correct: 0, total: 0 };
+                });
+                saveStats();
+                updateStats();
+            }
+        }
+
+        // Initialisation au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            populateAlphabet();
+            updateStats();
+        });
+    </script>
+
+</body>
+</html>
