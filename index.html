@@ -247,6 +247,7 @@ Double click make full screen.</p>
     </div>
 
 
+    <p id="info_s"></p>
 
     <footer style="vertical-align: bottom;">
         <spam leng="en"><a onclick="eng();change_lang('en');" onmouseover="eng();" onmouseout="retour();"
@@ -322,7 +323,7 @@ Double click make full screen.</p>
                 automne     22-23 septembre =8
                 hiver       21-22 décembre  =11  
                 */
-
+                info_s = document.getElementById("info_s");
 
                 var date = new Date();
                 year = date.getFullYear();
@@ -348,42 +349,50 @@ Double click make full screen.</p>
                 month = date.getMonth();
                 day = date.getDay();
 
-
+                info_s.innerHTML = date.toString() + " ";
                 if (between(date, date_paque,date_paque_f) ) {
                     saisson_now = "./image/paque.png";
+                    info_s.innerHTML += "\nstart:" + date_paque.toString() + "<br> end:" + date_paque_f.toString();
                 } else if (between(date, date_1er_mai,date_1er_mai_f) ) {
                     saisson_now = "./image/1er_mai.png";
+                    info_s.innerHTML += "start:" + date_1er_mai.toString() + "<br> end:" + date_1er_mai_f.toString();
                 } else if (between(date, date_1er_annee,date_1er_annee_f) ) {
                     saisson_now = "./image/1er_annee.png";
+                    info_s.innerHTML += "<br> start:" + date_1er_annee.toString() + "<br> end:" + date_1er_annee_f.toString();
                 } else if (between(date, date_noel,date_noel_f) ) {
                     saisson_now = "./image/noel.png";
+                    info_s.innerHTML += "<br> start:" + date_noel.toString() + "<br> end:" + date_noel_f.toString();
                 } else if (between(date, date_printemps, date_ete)) {
                     if (between(day, 20, 21)) {
                         saisson_now = "./image/hiver_printemps.png";
                     } else {
                         saisson_now = "./image/printemps.png";
                     }
+                    info_s.innerHTML += "<br> start:" + date_printemps.toString() + "<br> end:" + date_ete.toString();
                 } else if (between(date, date_ete, date_automne)) {
                     if (between(day, 20, 21)) {
                         saisson_now = "./image/printemps_ete.png";
                     } else {
                         saisson_now = "./image/ete.png";
                     }
+                    info_s.innerHTML += "<br> start:" + date_ete.toString() + "<br> end:" + date_automne.toString();
                 } else if (between(date, date_automne, date_hiver)) {
                     if (between(day, 22, 23)) {
                         saisson_now = "./image/ete_automne.png";
                     } else {
                         saisson_now = "./image/automne.png";
                     }
+                    info_s.innerHTML += "<br> start:" + date_automne.toString() + "<br> end:" + date_hiver.toString();
                 } else {
                     if (between(day, 21, 22)) {
                         saisson_now = "./image/automne_hiver.png";
                     } else {
                         saisson_now = "./image/hiver.png";
                     }
+                    info_s.innerHTML += "<br> start:" + date_hiver.toString() + "<br> end:" + date_printemps.toString();
                 }
 
-
+                info_s.innerHTML += "<br>" + saisson_now;
 
                 document.getElementsByTagName("html")[0].style.backgroundImage = "url(" + saisson_now + ")";
             }
