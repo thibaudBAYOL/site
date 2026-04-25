@@ -476,7 +476,7 @@
             { letter: 'Y', name: 'Yankee', image: '🇺🇸' },
             { letter: 'Z', name: 'Zulu', image: '⏰' }
         ];
-
+        var listToSee = [...alphabet.keys()];
         // Initialisation
         let quizActive = false;
         let currentQuizLetter = null;
@@ -543,8 +543,10 @@
         // Afficher la prochaine question
         function showNextQuestion() {
             if (!quizActive) return;
-            const randomIndex = Math.floor(Math.random() * alphabet.length);
-            currentQuizLetter = alphabet[randomIndex];
+            if (listToSee.length == 0)  listToSee = [...alphabet.keys()];
+            const randomIndex = Math.floor(Math.random() * listToSee.length);
+            currentQuizLetter = alphabet[listToSee[randomIndex]];
+            listToSee.splice(randomIndex,1);
             document.getElementById('quiz-letter').textContent = currentQuizLetter.letter;
             document.getElementById('quiz-image').textContent = currentQuizLetter.image;
             document.getElementById('quiz-input').value = '';
