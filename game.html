@@ -380,19 +380,23 @@
 
       var point_style = point.style;
 
+      let ecranLargeur = mouseInfo.offsetWidth;
+      let ecranHauteur = window.innerHeight
+      
       const top = point.style.top.replace("px", "");
-      if (upPressed) {
+      //if (upPressed && (top>(-1*parseInt(point_style.height.replace("px", ""))))) {
+      if (upPressed && (top>(-1*point.offsetTop))) {
         point_style.top = parseInt(top) - velocity * upPressed;
       }
-      if (downPressed) {
+      if (downPressed && top < ecranHauteur) {
         point_style.top = parseInt(top) + velocity * downPressed;
       }
       const left = point.style.left.replace("px", "");
-
-      if (leftPressed) {
+      //if (leftPressed && left>(-1*parseInt(point_style.width.replace("px", "")))) {
+      if (leftPressed && left>(-1*point.offsetLeft)) {
         point_style.left = parseInt(left) - velocity * leftPressed;
       }
-      if (rightPressed ) {
+      if (rightPressed && left < ecranLargeur) {
         point_style.left = parseInt(left) + velocity * rightPressed;
       }
 
