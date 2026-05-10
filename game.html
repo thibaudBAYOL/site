@@ -1,0 +1,432 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>FIRE GAME</title>
+  <!--meta name="viewport" content="width=device-width, initial-scale=1.0"-->
+</head>
+
+
+<body>
+  <div id="chargeur"></div>
+  <div>
+    <div id="mouseInfo" style="width:100%;height:95%;background:red;" onmousedown="mdown()" onmouseup="mup()">
+      <div id="point" style="width:175px;height: 140px;background:url(./image/cible_v1.png);position:absolute;" hidden></div>
+      <div id="point_p" style="width:10px;height:10px;background:yellow;position:absolute;" hidden></div>
+    </div>
+    <button type="button" style="display:inline;" onmousedown="mdown()" onmouseup="mup()">FIRE</button>
+    <div id="info"></div>
+  </div>
+
+  <script async type="text/javascript">
+
+    let id = "mouseInfo";
+    var mouseInfo = document.getElementById(id); // ZONE de jeu
+    var point = document.getElementById('point'); // Cible (pointeur)
+    var point_p = document.getElementById('point_p'); // movement touch (pointeur)
+    var info = document.getElementById('info'); // Cible (pointeur)
+
+    let fréquence_tire = 40; // ms entre chaque tire
+    let last_tire = 0;
+    let vitesse_tire = 10; // ms pour ce déplace de 2px (vers le haut)
+    let last_move_tire = 0;
+    let interval_fram = 10;
+
+    var fire = null;// Contient l'evenement de tire en cour (null si l'on ne tire pas sinon c'est le resusltat de la fonction setInterval)
+
+
+    /**
+     * Contient les tires qui sont en cour de deplacement.
+    */
+    let chargeur = document.getElementById("chargeur");
+
+    function set_fire() {
+
+
+      var balle = document.createElement("div");
+      balle.style.backgroundColor = "pink";
+      balle.style.width = "5px";
+      balle.style.height = "5px";
+      balle.style.position = "absolute";
+      balle.style.left = (parseInt(point.style.left.replace("px", "")) + parseInt(point.style.width.replace("px", "") / 2));
+      balle.style.top = (parseInt(point.style.top.replace("px", "")) + parseInt(point.style.height.replace("px", "") / 2));
+      //style="width:10px;height:10px;background:rgb(0, 255, 0);position:absolute;"
+
+      chargeur.insertBefore(balle, chargeur.childNodes[0]);
+
+
+    }
+
+
+    function move_fire(chargeur, balle) {
+      balley = balle.style.top.replace("px", "");
+      if (mouseInfo.offsetTop < balley) {
+        balle.style.top = balley - 2;
+      } else {
+        chargeur.removeChild(balle);
+      }
+    }
+    /**
+     * Si clique down
+     * (start fire)
+    */
+    function mdown() {
+
+      if (fire == null) fire = setInterval(function () { set_fire() }, fréquence_tire);
+    }
+    /**
+     * Si clique up
+     * (stop fire)
+    */
+    function mup() {
+      if (fire != null) clearInterval(fire);
+      fire = null;
+    }
+
+    /**
+     * Retourne la position de la sourie.
+    */
+    function getMousePosition(event) {
+      // e = possition de l'evenement
+      var e = event || window.event;
+      // scroll = possition de la fenetre
+      // scroll[0] = Axe X
+      // scroll[1] = Axe Y
+      var scroll = new Array((document.documentElement && document.documentElement.scrollLeft) || window.pageXOffset || self.pageXOffset || document.body.scrollLeft, (document.documentElement && document.documentElement.scrollTop) || window.pageYOffset || self.pageYOffset || document.body.scrollTop);
+      return new Array(e.clientX + scroll[0], e.clientY + scroll[1]);
+    }
+
+    /**
+     * Si la sourie bouge alors faire bouger la cible
+    */
+    mouseInfo.onmousemove = function (event) {
+      // Le point est la cible.
+      if (!toucheEnfoncee || point.hidden){
+        point.hidden = false;
+        var point_style = point.style;
+        var mousePosition = getMousePosition(event);
+        info.innerHTML = 'onmousemove x:' + (mousePosition[0] - mouseInfo.offsetLeft) + 'y:' + (mousePosition[1] - mouseInfo.offsetTop);
+        point_style.left = (mousePosition[0] - 1) - (point_style.width.replace("px", ""));
+        point_style.top = (mousePosition[1] - 1) - (point_style.height.replace("px", ""));
+        console.log("onmousemove");
+      }
+    };
+
+
+    /**
+     * Si touch ecran tactile
+    */
+    var touchstart = null;
+
+    let toucheEnfoncee = false;
+    let doigtDeplacement = null;
+    let doigtTir = null;
+
+    function touchend(){
+      toucheEnfoncee = false;
+      downPressed = 0;
+      upPressed = 0;
+      leftPressed = 0;
+      rightPressed = 0;
+      point_p.hidden = true;
+    }
+    mouseInfo.ontouchend = function (event) {
+      for (let t of event.changedTouches) {
+
+        if (t.identifier === doigtDeplacement) {
+            doigtDeplacement = null;
+            touchend();
+            console.log("Déplacement arrêté");
+        }
+        if (t.identifier === doigtTir) {
+            doigtTir = null;
+            gtPressed = 0;
+            console.log("Tir arrêté");
+        }
+      }
+    };
+
+    mouseInfo.ontouchcancel = function (event) {
+      for (let t of event.changedTouches) {
+
+        if (t.identifier === doigtDeplacement) {
+            doigtDeplacement = null;
+            touchend();
+            console.log("Déplacement arrêté");
+        }
+        if (t.identifier === doigtTir) {
+            doigtTir = null;
+            gtPressed = 0;
+            console.log("Tir arrêté");
+        }
+      }
+    };
+
+    mouseInfo.ontouchmove = function (event) {
+      event.preventDefault(); // évite le scroll pendant le déplacement du doigt
+      if (toucheEnfoncee){
+        point.hidden = false;
+        var point_style = point.style;
+        // Récupération de la position du doigt
+        var touch = event.touches[0];
+        var x = (touch.clientX - touchstart.clientX)/100;
+        var y = (touch.clientY - touchstart.clientY)/100;
+
+        downPressed = 0;
+        upPressed = 0;
+        leftPressed = 0;
+        rightPressed = 0;
+        // si vers le bas
+        if(y>0){
+          downPressed = Math.abs(y);
+        }else{
+          upPressed = Math.abs(y);
+        }
+
+        // si vers la droite
+        if(x>0){
+          rightPressed = Math.abs(x);
+        }else{
+          leftPressed = Math.abs(x);
+        }
+        info.innerHTML = 'ontouchmove x:' + (x) + ' y:' + (y);
+        console.log('ontouchmove x:' + (x) + ' y:' + (y));
+        console.log("downPressed"+downPressed+" upPressed"+upPressed + " rightPressed" + rightPressed + " leftPressed" + leftPressed)
+      }
+    };
+
+    mouseInfo.ontouchstart = function (event) {
+      console.log('ontouchstart');
+      for (let t of event.changedTouches) {
+        console.log('changedTouches');
+        // Si aucun doigt ne contrôle le déplacement → on prend celui-ci
+        if (doigtDeplacement === null) {
+          console.log('doigtDeplacement === null');
+            doigtDeplacement = t.identifier;
+            var touch = event.touches[0];
+            touchstart = touch;
+            toucheEnfoncee = true;
+
+            point_p.hidden = false;
+            var point_style = point_p.style;
+            var x = touch.clientX;
+            var y = touch.clientY;
+            point_style.left = (x - 1) - parseInt(point_style.width.replace("px", ""));
+            point_style.top = (y - 1) - parseInt(point_style.height.replace("px", ""));
+
+            console.log("Déplacement activé");
+        }
+        // Sinon, le deuxième doigt devient le tir
+        else if (doigtTir === null) {
+            doigtTir = t.identifier;
+            gtPressed = 1;
+            console.log("Tir activé");
+        }
+    }
+      
+    };
+
+    /*gamepad CODE*/
+
+    /*https://www.youtube.com/watch?v=GOjMP6WY8CU*/
+    /*https://github.com/CodingWith-Adam/gamepad-api-simple-game/blob/main/index.js*/
+    /*https://codingwith-adam.github.io/gamepad-tester/*/
+
+    let playerX = 0;
+    let playerY = 0;
+
+    let velocity = 10;
+
+    let controllerIndex = null;
+    let leftPressed = 0;
+    let rightPressed = 0;
+    let upPressed = 0;
+    let downPressed = 0;
+
+    let leftPressed2 = 0;
+    let rightPressed2 = 0;
+    let upPressed2 = 0;
+    let downPressed2 = 0;
+
+    let lbPressed = 0;
+    let ltPressed = 0;
+    let gbPressed = 0;
+    let gtPressed = 0;
+
+    let aPressed = 0;
+    let bPressed = 0;
+    let xPressed = 0;
+    let yPressed = 0;
+
+    let pausePressed = 0;
+    let startPressed = 0;
+
+    window.addEventListener("gamepadconnected", (event) => {
+      controllerIndex = event.gamepad.index;
+      console.log("connected");
+    });
+
+    window.addEventListener("gamepaddisconnected", (event) => {
+      console.log("disconnected");
+      controllerIndex = null;
+    });
+
+    function loggp() {
+      if (controllerIndex !== null) {
+        console.log(navigator.getGamepads()[controllerIndex]);
+      }
+    }
+
+    /**
+     * lire l'input du Gamepads
+    */
+    function controllerInput() {
+      if (controllerIndex !== null) {
+        const gamepad = navigator.getGamepads()[controllerIndex];
+
+        const buttons = gamepad.buttons;
+
+        aPressed = buttons[0].pressed ? 0.1 : 0;
+        bPressed = buttons[1].pressed ? 0.1 : 0;
+        xPressed = buttons[2].pressed ? 0.1 : 0;
+        yPressed = buttons[3].pressed ? 0.1 : 0;
+
+        // Gachet
+        // UP
+        //  LEFT
+        lbPressed = buttons[4].pressed ? 0.1 : 0;
+        //  RIGHT
+        gbPressed = buttons[5].pressed ? 0.1 : 0;
+        // DOWN
+        //  LEFT
+        ltPressed = buttons[6].value ? 0.1 : 0;
+        //  RIGHT
+        gtPressed = buttons[7].value ? 0.1 : 0;
+
+        // Spécial
+        pausePressed = buttons[8].pressed ? 0.1 : 0;
+        startPressed = buttons[9].pressed ? 0.1 : 0;
+
+        // Bouton de direction.
+        upPressed = buttons[12].pressed ? 0.1 : 0;
+        downPressed = buttons[13].pressed ? 0.1 : 0;
+        leftPressed = buttons[14].pressed ? 0.1 : 0;
+        rightPressed = buttons[15].pressed ? 0.1 : 0;
+
+
+
+        const stickDeadZone = 0.01;
+
+        // AXE 1
+        //  LEFT
+        const leftRightValue = gamepad.axes[0];
+        if (leftRightValue >= stickDeadZone) {
+          rightPressed = leftRightValue;
+        } else if (leftRightValue <= -stickDeadZone) {
+          leftPressed = leftRightValue * -1;
+        }
+        //  UP
+        const upDownValue = gamepad.axes[1];
+        if (upDownValue >= stickDeadZone) {
+          downPressed = upDownValue;
+        } else if (upDownValue <= -stickDeadZone) {
+          upPressed = upDownValue * -1;
+        }
+
+        // AXE 2
+        //  LEFT
+        const leftRightValue2 = gamepad.axes[2];
+        if (leftRightValue2 >= stickDeadZone) {
+          rightPressed = leftRightValue2;
+        } else if (leftRightValue2 <= -stickDeadZone) {
+          leftPressed = leftRightValue2 * -1;
+        }
+        //  UP
+        const upDownValue2 = gamepad.axes[3];
+        if (upDownValue2 >= stickDeadZone) {
+          downPressed = upDownValue2;
+        } else if (upDownValue2 <= -stickDeadZone) {
+          upPressed = upDownValue2 * -1;
+        }
+
+      }
+    }
+
+    function actionfire() {
+      time_now = new Date();
+      if ((time_now - last_move_tire) > vitesse_tire) {
+        for (i = 0; i < chargeur.childNodes.length; i++) {
+          move_fire(chargeur, chargeur.childNodes[i]);
+        }
+      }
+    }
+
+    function actionPlayer() {
+      
+      if (gtPressed) {
+        time_now = new Date();
+        if ((time_now - last_tire) > fréquence_tire) {
+          set_fire();
+        }
+      }
+
+    }
+
+    /**
+     * Faire bouger la cible en fonction de l'input du gamepad
+     * mouseInfo.offsetTop < balley
+    */
+    function movePlayer() {
+
+      var point_style = point.style;
+
+      const top = point.style.top.replace("px", "");
+      if (upPressed) {
+        point_style.top = parseInt(top) - velocity * upPressed;
+      }
+      if (downPressed) {
+        point_style.top = parseInt(top) + velocity * downPressed;
+      }
+      const left = point.style.left.replace("px", "");
+
+      if (leftPressed) {
+        point_style.left = parseInt(left) - velocity * leftPressed;
+      }
+      if (rightPressed ) {
+        point_style.left = parseInt(left) + velocity * rightPressed;
+      }
+
+      //console.log("left:" + point_style.left + " top:" +  + " p:" +upPressed);
+      if (upPressed || downPressed || leftPressed || rightPressed){
+        info.innerHTML = 'x:' + point_style.left + 'y:' + point_style.top;
+      }
+    }
+
+    /**
+     * Action de la cible
+    */
+    function updatePlayer() {
+      movePlayer();
+      actionPlayer();
+      actionfire();
+    }
+
+    /**
+     * Boucle d'actions a chaque Frame.
+    */
+    function gameLoop() {
+      controllerInput();
+      updatePlayer();
+      //https://developer.mozilla.org/fr/docs/Web/API/Window/requestAnimationFrame
+      //requestAnimationFrame(gameLoop);
+    }
+
+    setInterval(function () { gameLoop() }, interval_fram);
+
+
+  </script>
+
+  <footer><a href="index.html">Accueil/Home</a></footer>
+</body>
+
+</html>
