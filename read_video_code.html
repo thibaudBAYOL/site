@@ -1,0 +1,93 @@
+<!-- code generé en partie avec copilote-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Scanner ZXing Play/Stop + Historique</title>
+  <style>
+    video { width: 100%; max-width: 400px; border: 2px solid #444; }
+    button { padding: 10px; margin: 5px; }
+    input { width: 100%; padding: 10px; margin-top: 10px; }
+    .history-item { margin-top: 15px; border: 1px solid #ccc; padding: 10px; }
+    .history-item img { width: 150px; border: 1px solid #666; }
+  </style>
+</head>
+<body>
+
+  <video id="video" autoplay playsinline></video>
+
+  <div>
+    <button id="playBtn">▶️ Play</button>
+    <button id="stopBtn">⏹️ Stop</button>
+  </div>
+
+  <input id="result" type="text" placeholder="Résultat du scan">
+
+  <h3>Historique :</h3>
+  <div id="history"></div>
+
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+
+  <script>
+    const video = document.getElementById("video");
+    const resultInput = document.getElementById("result");
+    const history = document.getElementById("history");
+
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+    let scanning = false;
+
+    async function startCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+        audio: false
+      });
+      video.srcObject = stream;
+    }
+
+    function captureFrame() {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+      return canvas.toDataURL("image/png");
+    }
+
+    // PLAY → démarre le scan continu
+    document.getElementById("playBtn").onclick = async () => {
+      if (scanning) return;
+      scanning = true;
+
+      await startCamera();
+
+      codeReader.decodeFromVideoDevice(null, video, (result, err) => {
+        if (!scanning) return;
+
+        if (result) {
+          const text = result.text;
+          if(text !== resultInput.value){
+          resultInput.value = text;
+
+          const imgData = captureFrame();
+
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.innerHTML = `
+            <strong>Code détecté :</strong> ${text}<br>
+            <img src="${imgData}">
+          `;
+          history.prepend(item);
+          }
+        }
+      });
+    };
+
+    // STOP → arrête immédiatement le scan
+    document.getElementById("stopBtn").onclick = () => {
+      scanning = false;
+      codeReader.reset(); // ← ARRÊT OFFICIEL ZXing
+    };
+  </script>
+
+</body>
+</html>
