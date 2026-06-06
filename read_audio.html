@@ -83,9 +83,6 @@ function startGraph() {
   graphData = [];
   graphStartTime = performance.now();
   graphRunning = true;
-  let minDb = 0;
-  let maxDb = -90;
-  let maxFreq = 0;
   requestAnimationFrame(drawGraph);
 }
 
@@ -108,10 +105,8 @@ function drawGraph() {
   }
 
   const maxTime = graphData.length;
-  //const minDb = -90;
-  //const maxDb = 0;
+  
   const minFreq = 0;
-  //let maxFreq = 1000// limite affichée (modifiable)
 
   // Fréquence (bleu)
   ctx.strokeStyle = "cyan";
@@ -137,6 +132,10 @@ function drawGraph() {
     else ctx.lineTo(x, y);
   });
   ctx.stroke();
+
+  minDb = 0;
+  maxDb = -90;
+  maxFreq = 0;
 
   requestAnimationFrame(drawGraph);
 }
