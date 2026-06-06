@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Analyse Audio Graphique Temps Réel</title>
+<style>
+  body { font-family: Arial; padding: 20px; }
+  button { padding: 10px; margin: 5px; }
+  #live { font-size: 20px; margin-top: 20px; }
+  canvas { width: 100%; height: 150px; background: #111; margin-top: 10px; }
+  .entry { border-bottom: 1px solid #ccc; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<h2>Analyse Audio Temps Réel</h2>
+
+<button id="startBtn">▶️ ON</button>
+<button id="stopBtn">⏹️ OFF</button>
+<button id="stepBtn">📌 STEP</button>
+
+
+<div id="live">
+  Volume : <span id="vol">0</span> dBFS<br>
+  Fréquence : <span id="freq">0</span> Hz<br>
+  Note : <span id="note">—</span>
+</div>
+
+<h3>Oscilloscope<button id="toggleOscBtn">👁️</button></h3>
+<canvas id="osc" hidden></canvas>
+
+<h3>Spectre<button id="toggleFftBtn">👁️</button></h3>
+<canvas id="fft" hidden></canvas>
+
+<h3>GRATH time<button id="toggletimeGraph">👁️</button></h3>
+<div id="divtimeGraph" hidden>
+<canvas id="timeGraph" width="800" height="300" style="border:1px solid #444"></canvas>
+<h6><span style="color:red">Volume</span>,<span style="color:cyan">Fréquence (bleu)</span></h6>
+</div>
+
+<h3>Historique :<button id="toggleHistoryBtn">👁️</button></h3>
+<div id="history" hidden></div>
+
+<h3>Niveaux sonores (dB)<button id="toggledb">👁️</button></h3> 
+<table id="table-db" border="1" cellpadding="4" hidden>
+  <tr><th>Niveau</th><th>dB</th><th>Description</th><th>dBFS approx.</th></tr>
+  <tr><td>Respiration</td><td>10</td><td>Presque inaudible</td><td>-85 dBFS</td></tr>
+  <tr><td>Chambre calme</td><td>30</td><td>Très faible</td><td>-70 dBFS</td></tr>
+  <tr><td>Conversation normale</td><td>60</td><td>Niveau courant</td><td>-30 dBFS</td></tr>
+  <tr><td>Rue animée</td><td>70</td><td>Gênant à la longue</td><td>-25 dBFS</td></tr>
+  <tr><td>Circulation dense</td><td>80</td><td>Limite prolongée</td><td>-20 dBFS</td></tr>
+  <tr><td>Moto / tondeuse</td><td>90</td><td>Dangereux à long terme</td><td>-15 dBFS</td></tr>
+  <tr><td>Marteau-piqueur</td><td>100</td><td>Très dangereux</td><td>-10 dBFS</td></tr>
+  <tr><td>Concert / boîte</td><td>110</td><td>Risque immédiat</td><td>-7 dBFS</td></tr>
+  <tr><td>Avion au décollage</td><td>120</td><td>Seuil de douleur</td><td>-5 dBFS</td></tr>
+
+</table>
+
+<h3>Notes de musique (exemples)<button id="togglenotes">👁️</button></h3>
+<div id="notesTableContainer"></div>
+
+
+
+<script>
+/* ------------------------------
+   VARIABLES GLOBALES
+------------------------------ */
+let audioCtx, analyser, dataArray, freqArray, stream;
+let running = false;
+let history = [];
+
+let graphData = [];
+let graphRunning = false;
+let graphStartTime = 0;
+
+
+/*graphe dans le temp*/
+function startGraph() {
+  graphData = [];
+  graphStartTime = performance.now();
+  graphRunning = true;
+  requestAnimationFrame(drawGraph);
+}
+
+function stopGraph() {
+  graphRunning = false;
+}
+
+
+function drawGraph() {
+  if (!graphRunning) return;
+
+  const canvas = document.getElementById("timeGraph");
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (graphData.length < 2) {
+    requestAnimationFrame(drawGraph);
+    return;
+  }
+
+  const maxTime = graphData[graphData.length - 1].t;
+  const minDb = -90;
+  const maxDb = 0;
+  const minFreq = 0;
+  const maxFreq = 2000; // limite affichée (modifiable)
+
+  // Volume (rouge)
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  graphData.forEach((p, i) => {
+    const x = (p.t / maxTime) * canvas.width;
+    const y = canvas.height - ((p.db - minDb) / (maxDb - minDb)) * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Fréquence (bleu)
+  ctx.strokeStyle = "cyan";
+  ctx.beginPath();
+  graphData.forEach((p, i) => {
+    const x = (p.t / maxTime) * canvas.width;
+    const y = canvas.height - ((p.freq - minFreq) / (maxFreq - minFreq)) * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  requestAnimationFrame(drawGraph);
+}
+
+
+
+/*Liste des notes + conversion fréquence → note*/
+const NOTES = [
+  "Do", "Do♯", "Ré", "Ré♯", "Mi", "Fa",
+  "Fa♯", "Sol", "Sol♯", "La", "La♯", "Si"
+];
+
+function freqToNote(freq) {
+  if (!freq || freq < 1) return "—";
+  const A4 = 440;
+  const n = Math.round(12 * Math.log2(freq / A4));
+  const noteIndex = (n + 9 + 1200) % 12; // +9 pour aligner La
+  const octave = 4 + Math.floor((n + 9) / 12);
+  return NOTES[noteIndex] + octave;
+}
+
+
+/* ------------------------------
+   COOKIES UTILITAIRES
+------------------------------ */
+function saveHistory() {
+  try {
+    const json = JSON.stringify(history);
+    document.cookie = "audioHistory=" + encodeURIComponent(json) + "; path=/; max-age=31536000";
+  } catch(e) {
+    history.shift();
+    saveHistory();
+  }
+}
+
+function loadHistory() {
+  const match = document.cookie.match(/audioHistory=([^;]+)/);
+  if (match) {
+    try {
+      history = JSON.parse(decodeURIComponent(match[1]));
+    } catch(e) { history = []; }
+  }
+}
+loadHistory();
+
+/* ------------------------------
+   AFFICHAGE HISTORIQUE
+------------------------------ */
+function renderHistory() {
+  const div = document.getElementById("history");
+  div.innerHTML = "";
+  [...history].reverse().forEach(h => {
+    const e = document.createElement("div");
+    e.className = "entry";
+    e.textContent = `${h.date} — ${h.volume} dB — ${h.freq} Hz`;
+    div.appendChild(e);
+  });
+}
+renderHistory();
+
+/* ------------------------------
+   ANALYSE AUDIO
+------------------------------ */
+async function startAudio() {
+  if (running) return;
+  running = true;
+  
+  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  audioCtx = new AudioContext();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+
+  const source = audioCtx.createMediaStreamSource(stream);
+  source.connect(analyser);
+
+  dataArray = new Uint8Array(analyser.fftSize);
+  freqArray = new Uint8Array(analyser.frequencyBinCount);
+
+  if(!document.getElementById("divtimeGraph").hidden) startGraph();
+  loop();
+}
+
+function stopAudio() {
+  running = false;
+  stopGraph();
+  if (stream) stream.getTracks().forEach(t => t.stop());
+}
+
+/* ------------------------------
+   BOUCLE TEMPS RÉEL
+------------------------------ */
+function loop() {
+  if (!running) return;
+
+  analyser.getByteTimeDomainData(dataArray);
+  analyser.getByteFrequencyData(freqArray);
+
+  // Volume RMS → dB
+  let sum = 0;
+  for (let i = 0; i < dataArray.length; i++) {
+    const v = (dataArray[i] - 128) / 128;
+    sum += v * v;
+  }
+  const rms = Math.sqrt(sum / dataArray.length);
+  const db = Math.round(20 * Math.log10(rms + 0.0001));
+
+  // Fréquence dominante
+  let max = 0, index = 0;
+  for (let i = 0; i < freqArray.length; i++) {
+    if (freqArray[i] > max) {
+      max = freqArray[i];
+      index = i;
+    }
+  }
+  const freq = Math.round(index * audioCtx.sampleRate / analyser.fftSize);
+
+  document.getElementById("vol").textContent = db;
+  document.getElementById("freq").textContent = freq;
+  document.getElementById("note").textContent = freqToNote(freq);
+
+  drawOscilloscope();
+  drawFFT();
+
+  if (graphRunning) {
+    const t = (performance.now() - graphStartTime) / 1000; // secondes
+    graphData.push({ t, db, freq });
+
+    // limiter la mémoire (ex: 10 000 points max)
+    if (graphData.length > 10000) graphData.shift();
+  }
+
+
+  requestAnimationFrame(loop);
+}
+
+/* ------------------------------
+   OSCILLOSCOPE
+------------------------------ */
+function drawOscilloscope() {
+  const canvas = document.getElementById("osc");
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = "#0f0";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+
+  const slice = canvas.width / dataArray.length;
+  let x = 0;
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const v = dataArray[i] / 255;
+    const y = v * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+    x += slice;
+  }
+
+  ctx.stroke();
+}
+
+/* ------------------------------
+   SPECTRE FFT
+------------------------------ */
+function drawFFT() {
+  const canvas = document.getElementById("fft");
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const barWidth = canvas.width / freqArray.length;
+
+  for (let i = 0; i < freqArray.length; i++) {
+    const v = freqArray[i];
+    const h = (v / 255) * canvas.height;
+    ctx.fillStyle = "rgb(" + v + ",50,50)";
+    ctx.fillRect(i * barWidth, canvas.height - h, barWidth, h);
+  }
+}
+
+/* ------------------------------
+   STEP → ajoute une entrée
+------------------------------ */
+document.getElementById("stepBtn").onclick = () => {
+  const v = document.getElementById("vol").textContent;
+  const f = document.getElementById("freq").textContent;
+
+  const entry = {
+    date: new Date().toLocaleString(),
+    volume: v,
+    freq: f
+  };
+
+  history.push(entry);
+  saveHistory();
+  renderHistory();
+};
+
+/* ------------------------------
+   BOUTONS ON/OFF
+------------------------------ */
+document.getElementById("startBtn").onclick = startAudio;
+document.getElementById("stopBtn").onclick = stopAudio;
+
+
+/*hidden BOUTONS*/
+document.getElementById("toggleHistoryBtn").onclick = function () {
+  const h = document.getElementById("history");
+  h.hidden = !h.hidden;
+  this.style.backgroundColor = ((h.hidden)?"red":"");
+};
+
+document.getElementById("toggleOscBtn").onclick = function () {
+  const h = document.getElementById("osc");
+  h.hidden = !h.hidden;
+  this.style.backgroundColor = ((h.hidden)?"red":"");
+};
+
+document.getElementById("toggleFftBtn").onclick = function () {
+  const h = document.getElementById("fft");
+  h.hidden = !h.hidden;
+  this.style.backgroundColor = ((h.hidden)?"red":"");
+};
+document.getElementById("toggledb").onclick = function () {
+
+  const h = document.getElementById("table-db");
+  h.hidden = !h.hidden;
+  this.style.backgroundColor = ((h.hidden)?"red":"");
+};
+document.getElementById("toggletimeGraph").onclick = function () {
+  const h = document.getElementById("divtimeGraph");
+  h.hidden = !h.hidden;
+  if (running && !h.hidden) startGraph();
+  if (running && h.hidden) stopGraph();
+  this.style.backgroundColor = ((h.hidden)?"red":"");
+};
+
+
+
+document.getElementById("togglenotes").onclick = function () {
+  
+  if (document.getElementById("table-notes") == null) createNotesTable(); 
+  const h = document.getElementById("table-notes");
+  h.hidden = !h.hidden;
+  this.style.backgroundColor = ((h.hidden)?"red":"");
+};
+
+function playFreq(freq, duration = 1) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = "sine";       // onde sinusoïdale (pure)
+  osc.frequency.value = freq;
+
+  gain.gain.value = 0.2;   // volume raisonnable
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+
+  // arrêt automatique
+  setTimeout(() => {
+    osc.stop();
+    ctx.close();
+  }, duration * 1000);
+}
+
+function createNotesTable() {
+  const container = document.getElementById("notesTableContainer");
+  container.innerHTML = ""; // reset
+
+  const table = document.createElement("table");
+  table.id = "table-notes"
+  table.hidden = 1;
+  table.border = "1";
+  table.cellPadding = "4";
+
+  const header = document.createElement("tr");
+  header.innerHTML = "<th>Note</th><th>Fréquence (Hz)</th><th>Jouer</th>";
+  table.appendChild(header);
+
+  const noteNames = ["Do", "Do♯", "Ré", "Ré♯", "Mi", "Fa", "Fa♯", "Sol", "Sol♯", "La", "La♯", "Si"];
+
+  // On part de Do0 = 16.35 Hz
+  let freq = 16.35;
+  let octave = 0;
+  let index = 0;
+
+  while (freq <= 20000) {
+    const row = document.createElement("tr");
+
+    const noteName = noteNames[index] + octave;
+    row.innerHTML = `<td>${noteName}</td><td>${freq.toFixed(2)}</td><td><button onclick="playFreq(${freq.toFixed(2)})">▶</button>`;
+    table.appendChild(row);
+
+    // Demi-ton suivant
+    freq *= Math.pow(2, 1/12);
+    index++;
+
+    if (index === 12) {
+      index = 0;
+      octave++;
+    }
+  }
+
+  container.appendChild(table);
+}
+
+
+</script>
+
+</body>
+</html>
