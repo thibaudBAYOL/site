@@ -73,12 +73,19 @@ let graphData = [];
 let graphRunning = false;
 let graphStartTime = 0;
 
+let minDb = 0;
+let maxDb = -90;
+let maxFreq = 0;
+
 
 /*graphe dans le temp*/
 function startGraph() {
   graphData = [];
   graphStartTime = performance.now();
   graphRunning = true;
+  let minDb = 0;
+  let maxDb = -90;
+  let maxFreq = 0;
   requestAnimationFrame(drawGraph);
 }
 
@@ -101,15 +108,17 @@ function drawGraph() {
   }
 
   const maxTime = graphData[graphData.length - 1].t;
-  const minDb = -90;
-  const maxDb = 0;
+  //const minDb = -90;
+  //const maxDb = 0;
   const minFreq = 0;
-  const maxFreq = 2000; // limite affichée (modifiable)
+  //let maxFreq = 1000// limite affichée (modifiable)
 
   // Volume (rouge)
   ctx.strokeStyle = "red";
   ctx.beginPath();
   graphData.forEach((p, i) => {
+    minDb = Math.min(minDb,p.db);
+    maxDb = Math.max(maxDb,p.db);
     const x = (p.t / maxTime) * canvas.width;
     const y = canvas.height - ((p.db - minDb) / (maxDb - minDb)) * canvas.height;
     if (i === 0) ctx.moveTo(x, y);
@@ -121,6 +130,7 @@ function drawGraph() {
   ctx.strokeStyle = "cyan";
   ctx.beginPath();
   graphData.forEach((p, i) => {
+    maxFreq = Math.max(maxFreq,p.freq+1);
     const x = (p.t / maxTime) * canvas.width;
     const y = canvas.height - ((p.freq - minFreq) / (maxFreq - minFreq)) * canvas.height;
     if (i === 0) ctx.moveTo(x, y);
