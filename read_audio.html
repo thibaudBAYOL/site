@@ -92,6 +92,9 @@ let minFreq = document.getElementById('minFreq').value ?? 0;
 let maxFreq = document.getElementById('maxFreq').value ?? 20000;
 let indexFreq = document.getElementById('indexFreq').value ?? 0;
 
+const notifStep = 5;
+let notifStop = false;
+
 /*graphe dans le temp*/
 function startGraph() {
   graphData = [];
@@ -237,7 +240,7 @@ renderHistory();
 async function startAudio() {
   if (running) return;
   running = true;
-  
+  notifStop = false;
   stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   audioCtx = new AudioContext();
   analyser = audioCtx.createAnalyser();
@@ -288,6 +291,29 @@ function loop() {
   const freq = Math.round(index * audioCtx.sampleRate / analyser.fftSize);
 
   document.getElementById("vol").textContent = db;
+
+  if (!notifStop){
+    if (db >= indexVol && indexVol != 0) {
+      notifStop = true;
+      if (indexFreq > 0) playFreq(indexFreq,1);
+      sendNotification("Alerte VOL","VOL " + db +">=" + indexVol + "dBFS");
+      console.log("Alerte VOL","VOL " + db +">=" + indexVol + "dBFS");
+      setTimeout(function (){
+        notifStop = false;
+      },notifStep*1000);
+    }
+
+    if (db == indexFreq && indexFreq != 0){
+      notifStop = true;
+      playFreq(130.80,1);
+      sendNotification("Alerte Fre","Fre =" + indexFreq + "Hrz");
+      console.log("Alerte Fre","Fre =" + indexFreq + "Hrz");
+      setTimeout(function (){
+        notifStop = false;
+      },notifStep*1000);
+    }
+  }
+
   document.getElementById("freq").textContent = freq;
   document.getElementById("note").textContent = freqToNote(freq);
 
@@ -418,7 +444,7 @@ document.getElementById("togglenotes").onclick = function () {
   this.style.backgroundColor = ((h.hidden)?"red":"");
 };
 
-function playFreq(freq, duration = 1) {
+async function playFreq(freq, duration = 1) {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -478,6 +504,19 @@ function createNotesTable() {
   }
 
   container.appendChild(table);
+}
+
+function sendNotification(title, message) {
+
+  if (Notification.permission === "granted") {
+    new Notification(title, { body: message });
+  } else if (Notification.permission === "default") {
+    Notification.requestPermission().then(p => {
+      if (p === "granted") {
+        new Notification(title, { body: message });
+      }
+    });
+  }
 }
 
 
