@@ -35,7 +35,19 @@
 <h3>GRATH time<button id="toggletimeGraph">👁️</button></h3>
 <div id="divtimeGraph" hidden>
 <canvas id="timeGraph" width="800" height="300" style="border:1px solid #444"></canvas>
-<h6><span style="color:red">Volume</span>,<span style="color:cyan">Fréquence (bleu)</span></h6>
+<h6><span style="color:red">Volume</span>,
+<span style="color:purple">Volume index (purple)<input style=" height: 20; background-color: purple;" type="number" id="indexVol" value="0" onchange="indexVol = document.getElementById('indexVol').value ?? 0;">dBFS</span>
+<br>
+<span style="">Volume min<input style=" height: 20;" type="number" id="minDb" value="-90" onchange="minDb = document.getElementById('minDb').value ?? -90;">dBFS</span>
+<span style="">Volume max<input style=" height: 20; " type="number" id="maxDb" value="0" onchange="maxDb = document.getElementById('maxDb').value ?? 0;">dBFS</span>
+<br>
+<span style="color:cyan">Fréquence (bleu)</span>,
+<span style="color:yellow">Fréquence index<input style=" height: 20; background-color: yellow;" type="number" id="indexFreq" value="0" onchange="indexFreq = document.getElementById('indexFreq').value;">Htz</span>
+<br>
+<span style="">Fréquence min<input style=" height: 20;" type="number" id="minFreq" value="0" onchange="minFreq = document.getElementById('minFreq').value ?? 0;">Htz</span>
+<span style="">Fréquence max<input style=" height: 20;" type="number" id="maxFreq" value="20000" onchange="maxFreq = document.getElementById('maxFreq').value ?? 20000;">Htz</span>
+</h6>
+
 </div>
 
 <h3>Historique :<button id="toggleHistoryBtn">👁️</button></h3>
@@ -73,10 +85,12 @@ let graphData = [];
 let graphRunning = false;
 let graphStartTime = 0;
 
-let minDb = 0;
-let maxDb = -90;
-let maxFreq = 0;
-
+let maxDb = document.getElementById('maxDb').value ?? 0;
+let minDb = document.getElementById('minDb').value ?? -90;
+let indexVol = document.getElementById('indexVol').value ?? 0;
+let minFreq = document.getElementById('minFreq').value ?? 0;
+let maxFreq = document.getElementById('maxFreq').value ?? 20000;
+let indexFreq = document.getElementById('indexFreq').value ?? 0;
 
 /*graphe dans le temp*/
 function startGraph() {
@@ -106,13 +120,49 @@ function drawGraph() {
 
   const maxTime = graphData.length;
   
-  const minFreq = 0;
+    // Volume (rouge)
+  ctx.strokeStyle = "purple";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  graphData.forEach((p, i) => {
+    const x = (i / maxTime) * canvas.width;
+    const y = canvas.height - (Math.abs(indexVol - minDb) / Math.abs(minDb - maxDb)) * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+
+  // Volume (rouge)
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  graphData.forEach((p, i) => {
+    const x = (i / maxTime) * canvas.width;
+    const y = canvas.height - (Math.abs(p.db - minDb) / Math.abs(minDb - maxDb)) * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  
+  // Fréquence index (yellow)
+  ctx.strokeStyle = "yellow";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  graphData.forEach((p, i) => {
+    const x = (i / maxTime) * canvas.width;
+    const y = canvas.height - ((indexFreq - minFreq) / (maxFreq - minFreq)) * canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
 
   // Fréquence (bleu)
   ctx.strokeStyle = "cyan";
+  ctx.lineWidth = 2;
   ctx.beginPath();
   graphData.forEach((p, i) => {
-    maxFreq = Math.max(maxFreq,p.freq+1);
     const x = (i / maxTime) * canvas.width;
     const y = canvas.height - ((p.freq - minFreq) / (maxFreq - minFreq)) * canvas.height;
     if (i === 0) ctx.moveTo(x, y);
@@ -120,22 +170,7 @@ function drawGraph() {
   });
   ctx.stroke();
 
-  // Volume (rouge)
-  ctx.strokeStyle = "red";
-  ctx.beginPath();
-  graphData.forEach((p, i) => {
-    minDb = Math.min(minDb,p.db);
-    maxDb = Math.max(maxDb,p.db);
-    const x = (i / maxTime) * canvas.width;
-    const y = canvas.height - ((p.db - minDb) / (maxDb - minDb)) * canvas.height;
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
 
-  minDb = 0;
-  maxDb = -90;
-  maxFreq = 0;
 
   requestAnimationFrame(drawGraph);
 }
