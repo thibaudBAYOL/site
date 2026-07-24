@@ -295,7 +295,7 @@ function loop() {
   if (!notifStop){
     if (db >= indexVol && indexVol != 0) {
       notifStop = true;
-      if (indexFreq > 0) playFreq(indexFreq,1);
+      if (indexFreq > 0) playFreq(indexFreq,0.5);
       sendNotification("Alerte VOL","VOL " + db +">=" + indexVol + "dBFS");
       console.log("Alerte VOL","VOL " + db +">=" + indexVol + "dBFS");
       setTimeout(function (){
@@ -305,7 +305,7 @@ function loop() {
 
     if (db == indexFreq && indexFreq != 0){
       notifStop = true;
-      playFreq(130.80,1);
+      playFreq(130.80,0.5);
       sendNotification("Alerte Fre","Fre =" + indexFreq + "Hrz");
       console.log("Alerte Fre","Fre =" + indexFreq + "Hrz");
       setTimeout(function (){
