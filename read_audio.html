@@ -151,7 +151,7 @@ function drawGraph() {
   
   // Fréquence index (yellow)
   ctx.strokeStyle = "yellow";
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.beginPath();
   graphData.forEach((p, i) => {
     const x = (i / maxTime) * canvas.width;
@@ -163,7 +163,7 @@ function drawGraph() {
 
   // Fréquence (bleu)
   ctx.strokeStyle = "cyan";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1;
   ctx.beginPath();
   graphData.forEach((p, i) => {
     const x = (i / maxTime) * canvas.width;
@@ -341,7 +341,7 @@ function drawOscilloscope() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = "#0f0";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1;
   ctx.beginPath();
 
   const slice = canvas.width / dataArray.length;
@@ -372,7 +372,7 @@ function drawFFT() {
   for (let i = 0; i < freqArray.length; i++) {
     const v = freqArray[i];
     const h = (v / 255) * canvas.height;
-    ctx.fillStyle = "rgb(" + v + ",50,50)";
+    ctx.fillStyle = "rgb(" + v + ",150,"+(255-v)+")";
     ctx.fillRect(i * barWidth, canvas.height - h, barWidth, h);
   }
 }
