@@ -423,7 +423,7 @@
                     <div class="quiz-display" id="quiz-display">
                         <p style="color: #999; margin-bottom: 10px;">Quel est le nom aéronautique de cette lettre ?</p>
                         <div class="quiz-letter" id="quiz-letter"></div>
-                        <img class="quiz-image" id="quiz-image" alt="Image de la lettre">
+                        <img class="quiz-image" id="quiz-image" alt="Image de la lettre" hidden>
                         <div class="quiz-input-group">
                             <input type="text" id="quiz-input" placeholder="Entrez la réponse..." autocomplete="off">
                             <button class="btn-success" id="btn-submit-answer">Valider</button>
@@ -568,7 +568,7 @@
             const feedback = document.getElementById('feedback');
 
             stats[currentQuizLetter.letter].total++;
-
+            document.getElementById('quiz-image').hidden = false;
             if (userAnswer === correctAnswer) {
                 stats[currentQuizLetter.letter].correct++;
                 feedback.textContent = `✓ Correct ! ${currentQuizLetter.name} est la bonne réponse.`;
@@ -583,6 +583,7 @@
             updateStats();
 
             setTimeout(() => {
+                document.getElementById('quiz-image').hidden = true;
                 showNextQuestion();
             }, 2000);
         }
