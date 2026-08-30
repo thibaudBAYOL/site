@@ -11,6 +11,9 @@ const morseMap = {
 
 const reverseMorseMap = Object.fromEntries(Object.entries(morseMap).map(([k, v]) => [v, k]));
 const alphabet = Object.values(morseMap).filter(v => v !== ' ');
+const freqNoteDi = 650;
+const freqNoteDat = 440;
+const unitTime = 200;
 
 // --- Variables de saisie Morse ---
 let pressStartTime;
@@ -42,14 +45,18 @@ for (const [key, value] of Object.entries(reverseMorseMap)) {
 
     const row = document.createElement("tr");
 
-    const colMorse = document.createElement("td");
-    colMorse.textContent = key;
-
     const colAlpha = document.createElement("td");
-    colAlpha.textContent = value;
+    colAlpha.textContent = key;
 
-    row.appendChild(colMorse);
+    const colMorse = document.createElement("td");
+    colMorse.textContent = value;
+    colMorse.addEventListener("click",() =>{
+        playMorse(value);
+    });
+
     row.appendChild(colAlpha);
+    row.appendChild(colMorse);
+    
 
     tabMorse.appendChild(row);
 }
@@ -68,6 +75,9 @@ function handleEnd(e) {
     const symbol = duration > LONG_PRESS_THRESHOLD ? '-' : '.';
     
     currentMorseWord += symbol;
+    // play Morse
+    playMorse(symbol);
+
     updateMorseDisplay();
     updateQuizMorseDisplay(symbol);
     translateMorseToText();
@@ -133,10 +143,27 @@ textInput.addEventListener('input', () => {
     morseOutput.value = morse;
 });
 
+function generatquizQueue(){
+    switch (document.getElementById("level-quiz").value) {
+        case "1":
+            quizQueue = ['E', 'T', 'I', 'A', 'N', 'M'].sort(() => Math.random() - 0.5);
+            break;
+        case "2":
+            quizQueue = ['E', 'T', 'I', 'A', 'N', 'M', 'S', 'U', 'R', 'W', 'D', 'K', 'G', 'O'].sort(() => Math.random() - 0.5);
+            break;
+        case "3":
+            quizQueue = alphabet.filter(element => !/^\d+$/.test(element)).sort(() => Math.random() - 0.5);
+            break;
+        default:
+            quizQueue = alphabet.sort(() => Math.random() - 0.5);
+            break;
+    }
+}
 // --- Logique du Quiz ---
 function startQuiz(mode) {
     quizMode = mode;
-    quizQueue = [...alphabet].sort(() => Math.random() - 0.5);
+    generatquizQueue();
+    
     document.getElementById('quiz-container').style.display = 'block';
     document.getElementById('quiz-title').textContent = mode === 'toMorse' ? 'Traduire la lettre en Morse' : 'Traduire le Morse en lettre';
     showNextQuizItem();
@@ -144,7 +171,7 @@ function startQuiz(mode) {
 
 function showNextQuizItem() {
     if (quizQueue.length === 0) {
-        quizQueue = [...alphabet].sort(() => Math.random() - 0.5);
+        generatquizQueue();
     }
     currentQuizItem = quizQueue.pop();
     const display = document.getElementById('quiz-question-display');
@@ -153,6 +180,11 @@ function showNextQuizItem() {
         display.textContent = currentQuizItem;
     } else {
         display.textContent = reverseMorseMap[currentQuizItem];
+        // play Morse
+        playMorse(reverseMorseMap[currentQuizItem]);
+        display.addEventListener("click",()=>{
+            if (quizMode !== 'toMorse') playMorse(reverseMorseMap[currentQuizItem]);
+        });
     }
     
     document.getElementById('quiz-answer-input').value = '';
@@ -168,6 +200,8 @@ function checkQuizAnswer() {
 
     if (quizMode === 'toMorse') {
         correctAnswer = reverseMorseMap[currentQuizItem];
+        //play Morse
+        playMorse(correctAnswer);
         isCorrect = (input === correctAnswer);
     } else {
         correctAnswer = currentQuizItem;
@@ -243,6 +277,55 @@ function updateStatsDisplay() {
     `;
     letterStatsDiv.innerHTML = letterHtml;
 }
+/**
+ * freq (Hz)
+ * duration (ms)
+ */
+async function playFreq(freq, duration = 100) {
+  return new Promise((resolve, reject) => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";       // onde sinusoïdale (pure)
+    osc.frequency.value = freq;
+
+    gain.gain.value = 0.2;   // volume raisonnable
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+
+    // arrêt automatique
+    setTimeout(() => {
+        osc.stop();
+        ctx.close();
+        resolve();
+    }, duration);
+    });
+}
+
+//play Morse
+async function playMorse(Morse){
+
+    tab = Morse.split("");
+    for (let index = 0; index < tab.length; index++) {
+        //console.log(tab[index]);
+        if(tab[index] == '-'){
+            await playFreq(freqNoteDat, unitTime*2);
+            await playFreq(0, unitTime);
+        }else if(tab[index] == '.'){
+            await playFreq(freqNoteDi, unitTime*1)
+            await playFreq(0, unitTime);
+        }else if(tab[index] == ' '){
+            await playFreq(0, unitTime*3);
+        }else if(tab[index] == '/'){
+            await playFreq(0, unitTime*7);
+        } else {
+            await playFreq(0, unitTime*7);
+        }
+    }
+}
+
 
 // Événements Quiz
 document.getElementById('btn-quiz-morse')?.addEventListener('click', () => startQuiz('toMorse'));
@@ -258,3 +341,23 @@ document.getElementById('btn-reset-stats')?.addEventListener('click', () => {
         updateStatsDisplay();
     }
 });
+
+document.getElementById("image_tree_morse").addEventListener("dblclick",()=>{
+    if (!document.fullscreenElement) {
+            document.getElementById("image_tree_morse").requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+});
+
+//morse-input-area = morseInputArea
+morseInputArea.addEventListener("dblclick",()=>{
+playMorse(morseInputArea.value);
+});
+//morse-output = morseOutput
+morseOutput.addEventListener("dblclick",()=>{
+playMorse(morseOutput.value);
+});
+
