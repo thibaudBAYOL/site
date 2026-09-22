@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Atelier du geste — Alphabet LSF</title>
+    <style>
+        :root {
+            --ink: #173f42;
+            --cream: #f6f0e5;
+            --paper: #fffdf8;
+            --coral: #f06f61;
+            --yellow: #f2ce70;
+            --sage: #c9d8c1;
+            --muted: #6b7977
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--cream);
+            color: var(--ink);
+            font: 15px Arial, sans-serif
+        }
+
+        main {
+            max-width: 1160px;
+            margin: auto;
+            padding: 34px 22px 70px
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 80px
+        }
+
+        .brand {
+            font-weight: bold;
+            letter-spacing: .08em;
+            text-transform: uppercase
+        }
+
+        .brand b {
+            color: var(--coral)
+        }
+
+        .eyebrow {
+            color: var(--coral);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            font-weight: bold
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: Georgia, serif;
+            letter-spacing: -.04em
+        }
+
+        h1 {
+            font-size: clamp(44px, 7vw, 78px);
+            line-height: .95;
+            margin: 18px 0
+        }
+
+        h1 em,
+        h2 em {
+            color: var(--coral);
+            font-style: normal
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 110px
+        }
+
+        .hero p {
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 500px
+        }
+
+        .hero img {
+            width: 100%;
+            display: block;
+            box-shadow: 18px 18px 0 var(--yellow)
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            align-items: end;
+            margin-bottom: 30px
+        }
+
+        .section-head p {
+            max-width: 390px;
+            color: var(--muted);
+            line-height: 1.6
+        }
+
+        .alphabet {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px
+        }
+
+        .card {
+            background: var(--paper);
+            border: 1px solid #173f4230;
+            padding: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: .18s
+        }
+
+        .card:hover,
+        .card.active {
+            transform: translateY(-4px);
+            background: var(--sage)
+        }
+
+        .card img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            display: block;
+            background: #e9e3d8;
+            mix-blend-mode: multiply
+        }
+
+        .card strong {
+            font: 28px Georgia, serif;
+            display: block;
+            margin-top: 10px
+        }
+
+        .card small {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase
+        }
+
+        .detail {
+            margin: 40px 0 110px;
+            padding: 25px 30px;
+            background: var(--ink);
+            color: var(--cream);
+            display: flex;
+            gap: 30px;
+            align-items: center
+        }
+
+        .detail-letter {
+            font: 72px Georgia;
+            color: var(--yellow)
+        }
+
+        .detail p {
+            color: #bbcac5
+        }
+
+        .quiz {
+            background: #e5eee2;
+            padding: 60px 6%;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 50px;
+            margin: 0 -22px
+        }
+
+        .quiz h2 {
+            font-size: 55px;
+            line-height: .92
+        }
+
+        .board {
+            background: var(--paper);
+            padding: 25px
+        }
+
+        .question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .question img,
+        #quizVideo {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            background: #e9e3d8;
+            mix-blend-mode: multiply;
+            margin: 25px 0;
+            border: 0
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 5px
+        }
+
+        .answers button {
+            border: 1px solid #173f4230;
+            background: transparent;
+            padding: 10px;
+            font-weight: bold;
+            color: var(--ink);
+            cursor: pointer
+        }
+
+        .answers button:hover {
+            background: var(--coral);
+            color: #fff
+        }
+
+        .answers .correct {
+            background: var(--yellow)
+        }
+
+        .answers .wrong {
+            background: #f4c8c2
+        }
+
+        .result {
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid #173f4230;
+            display: flex;
+            justify-content: space-between
+        }
+
+        .result button {
+            border: 0;
+            background: none;
+            color: var(--coral);
+            font-weight: bold;
+            cursor: pointer
+        }
+
+        .stats {
+            margin-top: 100px
+        }
+
+        .stats table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--paper)
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #173f4225
+        }
+
+        th {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .1em
+        }
+
+        td strong {
+            font: 20px Georgia, serif
+        }
+
+        .bar {
+            display: inline-block;
+            width: 130px;
+            height: 5px;
+            background: #e1dbd0;
+            vertical-align: middle;
+            margin-right: 8px
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            background: var(--coral)
+        }
+
+        @media(max-width:800px) {
+
+            .hero,
+            .quiz {
+                grid-template-columns: 1fr
+            }
+
+            .alphabet {
+                grid-template-columns: repeat(4, 1fr)
+            }
+
+            .answers {
+                grid-template-columns: repeat(7, 1fr)
+            }
+
+            .section-head {
+                display: block
+            }
+
+            .detail {
+                align-items: start
+            }
+
+            .hero {
+                margin-bottom: 70px
+            }
+        }
+
+        @media(max-width:500px) {
+            main {
+                padding: 22px 14px 50px
+            }
+
+            .alphabet {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .card img {
+                height: 140px
+            }
+
+            .quiz {
+                margin: 0 -14px;
+                padding: 45px 14px
+            }
+
+            .answers {
+                grid-template-columns: repeat(6, 1fr)
+            }
+
+            .detail {
+                margin-bottom: 70px;
+                padding: 20px
+            }
+
+            .stats {
+                overflow: auto
+            }
+
+            .stats table {
+                min-width: 500px
+            }
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            background: #173f42cc;
+            backdrop-filter: blur(8px);
+            display: grid;
+            place-items: center;
+            padding: 20px
+        }
+
+        .modal[hidden] {
+            display: none
+        }
+
+        .modal-box {
+            position: relative;
+            background: var(--paper);
+            width: min(900px, 96vw);
+            padding: 16px;
+            box-shadow: 0 28px 80px #102f324d
+        }
+
+        .modal-box:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            background: var(--ink);
+            display: grid;
+            place-content: center;
+            padding: 36px
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 10px;
+            top: 8px;
+            z-index: 2;
+            border: 0;
+            border-radius: 50%;
+            background: var(--coral);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            font-size: 25px;
+            cursor: pointer
+        }
+
+        .modal-media {
+            position: relative;
+            background: #dfe8df
+        }
+
+
+        .modal-hint {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            background: var(--ink);
+            color: var(--cream);
+            padding: 7px 9px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            pointer-events: none
+        }
+
+        .modal-info {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 22px;
+            align-items: center;
+            padding: 22px 5px 5px
+        }
+
+        .modal-info .detail-letter {
+            font: 72px Georgia;
+            color: var(--coral)
+        }
+
+        .modal-info p {
+            color: var(--muted);
+            line-height: 1.55;
+            margin: 8px 0 0
+        }
+
+        .modal-info small {
+            display: block;
+            color: var(--coral);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-top: 12px
+        }
+
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <div class="brand">✋ atelier <b>du geste</b></div>
+            <div class="eyebrow">LSF · apprendre par le regard</div>
+        </header>
+        <section class="hero">
+            <div>
+                <div class="eyebrow">01 · observer avant de signer</div>
+                <h1>Les mains parlent.<br><em>À vous de regarder.</em></h1>
+                <p>Découvrez les 26 lettres de l’alphabet dactylologique en langue des signes française, puis testez
+                    votre mémoire avec un quiz qui renouvelle son ordre à chaque tour.</p>
+            </div><img src="image/LSF/Main droite/sDa.png" alt="Illustration de mains en langue des signes">
+        </section>
+        <section id="alphabet">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">02 · la planche de référence</div>
+                    <h2>L’alphabet, lettre <em>par lettre.</em></h2>
+                </div>
+                <p>Cliquez sur une carte pour afficher la description du geste. Les images proviennent de
+                    <a href="https://bm.chalonsenchampagne.fr/mediatheques/ressources/langue-des-signes-francaise-lsf-images">bm.chalonsenchampagne.fr</a>.</p>
+            </div>
+            <div id="alphabetGrid" class="alphabet"></div>
+            <div id="detail" class="detail"></div>
+        </section>
+        <section id="quiz" class="quiz">
+            <aside>
+                <div class="eyebrow">03 · le studio de pratique</div>
+                <h2>À vous<br><em>de jouer.</em></h2>
+                <p>Une lettre à la fois : toutes les lettres passent avant qu’une même lettre ne revienne.</p>
+                <p id="score"></p><button id="reset" type="button">Réinitialiser les statistiques</button>
+            </aside>
+            <div class="board">
+                <div class="question"><span id="progress" class="eyebrow"></span><span id="round"></span></div><img
+                    id="quizGif" alt="Geste LSF à identifier">
+                <h3>Quelle est cette lettre&nbsp;?</h3>
+                <div id="answers" class="answers"></div>
+                <div id="result" class="result" hidden></div>
+            </div>
+        </section>
+        <section class="stats">
+            <div class="eyebrow">04 · suivre ses progrès</div>
+            <h2>Chaque lettre <em>compte.</em></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lettre</th>
+                        <th>Réussites</th>
+                        <th>Tentatives</th>
+                        <th>Précision</th>
+                    </tr>
+                </thead>
+                <tbody id="stats"></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        // Atelier du geste — version HTML/JS autonome, sans framework ni backend.
+        const lettres = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+        const gestes = {
+            A: 'Poing fermé, pouce posé sur le côté des doigts.', B: 'Main ouverte, doigts serrés et pouce replié dans la paume.', C: 'Main courbée en forme de C, paume tournée vers soi.', D: 'Index levé, autres doigts repliés et pouce en contact avec eux.', E: 'Doigts repliés vers la paume, pouce posé devant les phalanges.', F: 'Pouce et index se touchent, autres doigts ouverts.', G: 'Index et pouce tendus parallèlement, main orientée sur le côté.', H: 'Index et majeur tendus côte à côte, paume vers le bas.', I: 'Petit doigt tendu, autres doigts repliés.', J: 'Petit doigt tendu, le poignet dessine un mouvement en J.', K: 'Index et majeur tendus en V, pouce posé entre eux.', L: 'Index tendu vers le haut et pouce à l’horizontale.', M: 'Trois doigts repliés sur le pouce dans la paume.', N: 'Deux doigts repliés sur le pouce dans la paume.', O: 'Tous les doigts se rejoignent pour former un rond.', P: 'Forme proche du K, orientée vers le bas.', Q: 'Index et pouce tendus vers le bas.', R: 'Index et majeur croisés, autres doigts repliés.', S: 'Poing fermé, pouce posé devant les doigts.', T: 'Pouce glissé entre l’index et le majeur repliés.', U: 'Index et majeur tendus et collés.', V: 'Index et majeur tendus et écartés.', W: 'Index, majeur et annulaire tendus et écartés.', X: 'Index courbé comme un crochet, autres doigts repliés.', Y: 'Pouce et petit doigt tendus, autres doigts repliés.', Z: 'Index tendu qui dessine un Z dans l’espace.'
+        };
+        // (source des images) https://bm.chalonsenchampagne.fr/mediatheques/ressources/langue-des-signes-francaise-lsf-images
+        const images = { A: 'image/LSF/Main droite/sDa.png',B: 'image/LSF/Main droite/sDb.png',C: 'image/LSF/Main droite/sDc.png',D: 'image/LSF/Main droite/sDd.png',E: 'image/LSF/Main droite/sDe.png',F: 'image/LSF/Main droite/sDf.png',G: 'image/LSF/Main droite/sDg.png',H: 'image/LSF/Main droite/sDh.png',I: 'image/LSF/Main droite/sDi.png',J: 'image/LSF/Main droite/sDj.png',K: 'image/LSF/Main droite/sDk.png',L: 'image/LSF/Main droite/sDl.png',M: 'image/LSF/Main droite/sDm.png',N: 'image/LSF/Main droite/sDn.png',O: 'image/LSF/Main droite/sDo.png',P: 'image/LSF/Main droite/sDp.png',Q: 'image/LSF/Main droite/sDq.png',R: 'image/LSF/Main droite/sDr.png',S: 'image/LSF/Main droite/sDs.png',T: 'image/LSF/Main droite/sDt.png',U: 'image/LSF/Main droite/sDu.png',V: 'image/LSF/Main droite/sDv.png',W: 'image/LSF/Main droite/sDw.png',X: 'image/LSF/Main droite/sDx.png',Y: 'image/LSF/Main droite/sDy.png',Z: 'image/LSF/Main droite/sDz.png' };
+        const blank = () => Object.fromEntries(lettres.map(l => [l, { correct: 0, total: 0 }]));
+        let stats = JSON.parse(localStorage.getItem('atelier-geste-stats') || 'null') || blank();
+        let order = shuffle(lettres), index = 0, answered = false;
+        const $ = id => document.getElementById(id);
+        function shuffle(a) { return [...a].sort(() => Math.random() - .5) }
+        function renderAlphabet() { $('alphabetGrid').innerHTML = lettres.map((l, i) => `<button class="card" data-letter="${l}" type="button"><img src="${images[l]}" alt="Animation du geste LSF pour ${l}" loading="lazy"><small>${String(i + 1).padStart(2, '0')} · PNG LSF</small><strong>${l}</strong></button>`).join(''); document.querySelectorAll('.card').forEach(card => card.addEventListener('click', () => showDetail(card.dataset.letter)));  document.querySelectorAll('.card').forEach(card=>card.addEventListener('click',()=>openModal(card.dataset.letter))); } showDetail('A');
+        function showDetail(l) { document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', c.dataset.letter === l)); $('detail').innerHTML = `<div class="detail-letter">${l}</div><div><div class="eyebrow">geste sélectionné</div><h3>${gestes[l]}</h3><p>Observez la forme des doigts, puis l’orientation de la paume.</p></div>` }
+        function openModal(l){$('modalLetter').textContent=l;$('modalDescription').textContent=gestes[l];$('modalImage').src='image/LSF/Main droite/sD'+ l +'.png';$('modal').hidden=false} function closeModal(){ $('modalImage').src=''; $('modal').hidden=true } function showDetail(l){document.querySelectorAll('.card').forEach(c=>c.classList.toggle('active',c.dataset.letter===l))}
+        function renderQuiz() { const l = order[index]; $('progress').textContent = `QUESTION ${String(index + 1).padStart(2, '0')} / 26`; $('round').textContent = `${Math.round(index / 26 * 100)}% du tour`; $('quizGif').src = images[l]; $('answers').innerHTML = lettres.map(x => `<button type="button" data-answer="${x}">${x}</button>`).join(''); $('result').hidden = true; answered = false; document.querySelectorAll('[data-answer]').forEach(b => b.addEventListener('click', () => answer(b.dataset.answer))); }
+        function answer(choice) { if (answered) return; answered = true; const correct = choice === order[index], expected = order[index]; stats[expected].total++; if (correct) stats[expected].correct++; localStorage.setItem('atelier-geste-stats', JSON.stringify(stats)); document.querySelectorAll('[data-answer]').forEach(b => { b.disabled = true; if (b.dataset.answer === expected) b.classList.add('correct'); if (b.dataset.answer === choice && !correct) b.classList.add('wrong') }); const r = $('result'); r.hidden = false; r.innerHTML = `<span>${correct ? 'Bien vu.' : 'La bonne réponse était ' + expected + '.'}</span><button type="button" id="next">Question suivante →</button>`; $('next').onclick = nextQuestion; renderStats(); }
+        function nextQuestion() { index++; if (index === order.length) { order = shuffle(lettres); index = 0 } renderQuiz() }
+        function renderStats() { const total = Object.values(stats).reduce((n, s) => n + s.total, 0), good = Object.values(stats).reduce((n, s) => n + s.correct, 0); $('score').textContent = `Score global : ${total ? Math.round(good / total * 100) : 0}% (${good}/${total})`; $('stats').innerHTML = lettres.map(l => { const s = stats[l], rate = s.total ? Math.round(s.correct / s.total * 100) : 0; return `<tr><td><strong>${l}</strong></td><td>${s.correct}</td><td>${s.total}</td><td><span class="bar"><i style="width:${rate}%"></i></span>${rate}%</td></tr>` }).join('') }
+        $('reset').onclick = () => { stats = blank(); localStorage.removeItem('atelier-geste-stats'); renderStats() }; renderAlphabet(); renderQuiz(); renderStats();
+
+    </script>
+    <div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalLetter"
+        onclick="if(event.target===this)closeModal()">
+        <div id="modalBox" class="modal-box"><button class="modal-close" type="button" aria-label="Fermer"
+                onclick="closeModal()">×</button>
+            <div class="modal-media" ondblclick="document.getElementById('modalBox').requestFullscreen?.()"><img
+                    id="modalImage" style="align-content: center;"></img><span class="modal-hint">double-cliquez pour agrandir</span></div>
+            <div class="modal-info">
+                <div id="modalLetter" class="detail-letter"></div>
+                <div>
+                    <div class="eyebrow">geste</div>
+                    <h3 id="modalDescription"></h3>
+                    <p>Observez la forme des doigts et l’orientation de la paume.</p>
+                </div>
+            </div>
+        </div>
+    </div> 
+</body>
+<footer>
+</footer>
+</html>
