@@ -20,6 +20,9 @@ body {
 /* Container styling with perspective */
 .container {
   perspective: 1000px;
+  position: absolute /*relative*/;
+  left: 50%-100px;
+  top:50%-100px;
   /* The perspective property defines how far the object is from the viewer */
   /* A smaller value creates a more intense 3D effect */
 }
@@ -124,8 +127,19 @@ body {
     <link rel="stylesheet" href="style.css" />
   </head>
   <body id="zone">
-    <div class="container">
+    <div id="box" class="container">
       <div id="cube1" class="cube">
+        <div class="face front">Front</div>
+        <div class="face back">Back</div>
+        <div class="face right">Right</div>
+        <div class="face left">Left</div>
+        <div class="face top">Top</div>
+        <div class="face bottom">Bottom</div>
+      </div>
+
+
+
+      <div id="cube2" class="cube" hidden>
         <div class="face front">Front</div>
         <div class="face back">Back</div>
         <div class="face right">Right</div>
@@ -142,6 +156,8 @@ body {
 
   let rotationXfix = 0;
   let rotationYfix = 0;
+  let posXfix = 0;
+  let posYfix = 0;
   let rotationX = 0;
   let rotationY = 0;
 
@@ -183,6 +199,13 @@ body {
     rotationYfix += Number(degrees);
   }
 
+  function update_pos(x,y){
+    const cube = document.getElementById("box");
+    cube.style.left = (posXfix + x) +"px";
+    cube.style.top = (posYfix + y) + "px";
+    //console.log("update_pos=" + cube.style.left + " " + cube.style.top);
+  }
+
   // MOUSE
 
   let downmouse = false;
@@ -192,12 +215,21 @@ body {
 
   zone.onmousemove = function (event) {
     if ( downmouse ){
+      
       y = downmouseX - event.clientX;
       x = downmouseY - event.clientY;
+
+      if (event.ctrlKey){
+        update_pos(y*-1,x*-1);
+        //console.log("update_pos X=" + x + ' Y=' + y);
+      }else{
+
       move_x_set(x);
       move_y_set(y*-1);
       applyRotation();
-      //  console.log("onmousemove X=" + x + ' Y=' + y);
+      
+    }
+    //console.log("onmousemove X=" + x + ' Y=' + y);
     }
   }
 
@@ -206,15 +238,25 @@ body {
     downmouseX = event.clientX;
     downmouseY = event.clientY;
     // move
+    //console.log("mousedown");
   });
 
   zone.addEventListener('mouseup', function (event) {
+    if(downmouse){
     downmouse = false;
+    if (!event.ctrlKey){    
     y = downmouseX - event.clientX;
     x = downmouseY - event.clientY;
     move_x_fix(x);
     move_y_fix(y*-1);
     // fix
+    }else{
+      posXfix += y*-1;
+      posYfix += x*-1;
+      //console.log("posFix");
+    }
+    //console.log("mouseup");
+    }
   });
 
 
