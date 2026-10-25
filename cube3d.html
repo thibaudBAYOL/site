@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+    <style>
+        /* Basic reset and page styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container styling with perspective */
+.container {
+  perspective: 1000px;
+  /* The perspective property defines how far the object is from the viewer */
+  /* A smaller value creates a more intense 3D effect */
+}
+
+/* Cube container styles */
+.cube {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  /* This tells the browser that child elements should be positioned in 3D space */
+}
+
+/* Common styles for all faces */
+.face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+  opacity: 0.9;
+}
+
+/* Position each face of the cube */
+.front {
+  background-color: #ff8a65; /* Coral */
+  transform: translateZ(100px);
+  /* Moves the front face 100px towards the viewer */
+}
+
+.back {
+  background-color: #4fc3f7; /* Light Blue */
+  transform: rotateY(180deg) translateZ(100px);
+  /* Rotates 180° around Y-axis and moves 100px forward */
+}
+
+.right {
+  background-color: #81c784; /* Light Green */
+  transform: rotateY(90deg) translateZ(100px);
+  /* Rotates 90° right around Y-axis and moves 100px forward */
+}
+
+.left {
+  background-color: #9575cd; /* Purple */
+  transform: rotateY(-90deg) translateZ(100px);
+  /* Rotates 90° left around Y-axis and moves 100px forward */
+}
+
+.top {
+  background-color: #ffb74d; /* Orange */
+  transform: rotateX(90deg) translateZ(100px);
+  /* Rotates 90° upward around X-axis and moves 100px forward */
+}
+
+.bottom {
+  background-color: #f06292; /* Pink */
+  transform: rotateX(-90deg) translateZ(100px);
+  /* Rotates 90° downward around X-axis and moves 100px forward */
+}
+
+/* Define the rotation animation */
+@keyframes rotate {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    transform: rotateX(90deg) rotateY(90deg);
+  }
+  50% {
+    transform: rotateX(180deg) rotateY(180deg);
+  }
+  75% {
+    transform: rotateX(270deg) rotateY(270deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+/* Apply the animation to the cube */
+.cube {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  /*animation: rotate 20s infinite linear;*/
+  /* 20s defines the duration of one complete rotation */
+  /* infinite means the animation will repeat forever */
+  /* linear means the animation speed is constant */
+}
+    </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Rotating Cube</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body id="zone"
+    <div class="container">
+      <div id="cube1" class="cube">
+        <div class="face front">Front</div>
+        <div class="face back">Back</div>
+        <div class="face right">Right</div>
+        <div class="face left">Left</div>
+        <div class="face top">Top</div>
+        <div class="face bottom">Bottom</div>
+      </div>
+    </div>
+    
+
+    
+  </body>
+  <script>
+
+  let rotationXfix = 0;
+  let rotationYfix = 0;
+  let rotationX = 0;
+  let rotationY = 0;
+
+  function applyRotation() {
+    const cube = document.getElementById("cube1");
+
+    // Arrête l'animation automatique pour garder la rotation manuelle
+    cube.style.animation = "none";
+    //console.log("X=" + rotationXfix + " +x=" +rotationX + " Y=" + rotationYfix+ "+y=" + rotationY);
+    //console.log(`rotateX(${(rotationXfix+rotationX)%360}deg) rotateY(${(rotationYfix+rotationY)%360}deg)`);
+    cube.style.transform =
+      `rotateX(${(rotationXfix+rotationX)%360}deg) rotateY(${(rotationYfix+rotationY)%360}deg)`;
+  }
+
+  function move_x(degrees) {
+    rotationX += Number(degrees);
+  }
+
+  function move_y(degrees) {
+    rotationY += Number(degrees);
+  }
+
+
+  function move_x_set(degrees) {
+    rotationX = Number(degrees);
+  }
+
+  function move_y_set(degrees) {
+    rotationY = Number(degrees);
+    
+  }
+
+  function move_x_fix(degrees) {
+    rotationXfix += Number(degrees);
+
+  }
+
+  function move_y_fix(degrees) {
+    rotationYfix += Number(degrees);
+  }
+
+  // MOUSE
+
+  let downmouse = false;
+  let downmouseX = 0;
+  let downmouseY = 0;
+  zone = document.getElementById("zone");
+
+  zone.onmousemove = function (event) {
+    if ( downmouse ){
+      y = downmouseX - event.clientX;
+      x = downmouseY - event.clientY;
+      move_x_set(x);
+      move_y_set(y*-1);
+      applyRotation();
+      //  console.log("onmousemove X=" + x + ' Y=' + y);
+    }
+  }
+
+  zone.addEventListener('mousedown', function (event) {
+    downmouse = true;
+    downmouseX = event.clientX;
+    downmouseY = event.clientY;
+    // move
+  });
+
+  zone.addEventListener('mouseup', function (event) {
+    downmouse = false;
+    y = downmouseX - event.clientX;
+    x = downmouseY - event.clientY;
+    move_x_fix(x);
+    move_y_fix(y*-1);
+    // fix
+  });
+
+
+  //TAB
+  let firsttouch = null;
+  let touchX = 0;
+  let touchY = 0;
+
+  function stopontouch(event){
+    for (let t of event.changedTouches) {
+      if (t.identifier === firsttouch) {
+        firsttouch = null;
+        var touch = event.touches[0];
+        y = touchX - touch.clientX;
+        x = touchY - touch.clientY;
+        move_x_fix(x);
+        move_y_fix(y*-1);
+      }
+    }
+  }
+  zone.ontouchend = stopontouch;
+  zone.ontouchcancel = stopontouch;
+
+  zone.ontouchmove = function (event) {
+    event.preventDefault();
+    if(firsttouch !== null){
+      for (let t of event.changedTouches) {
+        if (t.identifier === firsttouch) {
+          var touch = event.touches[0];
+          y = touchX - touch.clientX;
+          x = touchY - touch.clientY;
+          move_x_set(x);
+          move_y_set(y*-1);
+        }
+      }
+    }
+  }
+
+  zone.ontouchstart = function (event) {
+    for (let t of event.changedTouches) {
+      // Si aucun doigt ne contrôle le déplacement → on prend celui-ci
+      if (firsttouch === null) {
+        firsttouch = t.identifier;
+        var touch = event.touches[0];
+        touchX = touch.clientX;
+        touchY = touch.clientY;
+      }
+    }
+  }
+
+</script>
+</html>
