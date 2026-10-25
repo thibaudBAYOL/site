@@ -227,11 +227,9 @@ body {
     for (let t of event.changedTouches) {
       if (t.identifier === firsttouch) {
         firsttouch = null;
-        var touch = event.touches[0];
-        y = touchX - touch.clientX;
-        x = touchY - touch.clientY;
-        move_x_fix(x);
-        move_y_fix(y*-1);
+        move_x_fix(rotationX);
+        move_y_fix(rotationY);
+        //console.log("stopontouch");
       }
     }
   }
@@ -248,6 +246,8 @@ body {
           x = touchY - touch.clientY;
           move_x_set(x);
           move_y_set(y*-1);
+          applyRotation();
+          //console.log("ontouchmove");
         }
       }
     }
@@ -261,6 +261,7 @@ body {
         var touch = event.touches[0];
         touchX = touch.clientX;
         touchY = touch.clientY;
+        //console.log("ontouchstart");
       }
     }
   }
