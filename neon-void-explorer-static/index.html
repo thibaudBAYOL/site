@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Neon Void Explorer</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02030e;color:#d9f6ff;font-family:'Space Grotesk',sans-serif}canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}.hud{position:fixed;inset:0;z-index:2;pointer-events:none}.top{position:absolute;top:22px;left:3vw;right:3vw;display:flex;justify-content:space-between;align-items:start}.brand{font:800 21px Syne,sans-serif;letter-spacing:.15em}.brand span{color:#23d7ff}.status,.coords,.panel,.settings{border:1px solid #287c9d;background:#03152bd0;box-shadow:0 0 22px #00658c22;backdrop-filter:blur(8px)}.status{padding:10px 14px;font-size:10px;letter-spacing:.15em}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#67f7cb;box-shadow:0 0 10px #67f7cb}.coords{position:absolute;right:3vw;top:82px;padding:12px 15px;min-width:210px}.eyebrow{font-size:9px;letter-spacing:.24em;color:#82bed0}.coords strong{display:block;margin-top:7px;font-size:12px;letter-spacing:.12em}.cross{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%)}.cross:before,.cross:after{content:'';position:absolute;background:#52e7ff;box-shadow:0 0 10px #00cfff}.cross:before{left:0;top:13px;width:28px;height:1px}.cross:after{left:13px;top:0;width:1px;height:28px}.panel{position:absolute;bottom:30px;left:3vw;padding:14px 16px;font-size:9px;letter-spacing:.12em}.settings{pointer-events:auto;position:absolute;right:3vw;bottom:30px;color:#9eeaff;background:#03152bd0;border:1px solid #287c9d;padding:10px 14px;letter-spacing:.14em}.touch{display:none}.modal{display:none;pointer-events:auto;position:absolute;inset:0;place-items:center;background:#010410b8;backdrop-filter:blur(8px)}.modal.open{display:grid}.card{width:min(560px,calc(100vw - 32px));max-height:90vh;overflow:auto;padding:24px;background:#041632f5;border:1px solid #39c8ee;box-shadow:0 0 50px #007fc933}.card h2{font:700 22px Syne,sans-serif;margin:8px 0}.close{float:right;background:none;border:0;color:#9eeaff;font-size:28px}.help{font-size:12px;color:#9cc9d6;line-height:1.5}.row{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;margin-top:8px;border:1px solid #287c9d55;font-size:12px}.row button{min-width:110px;padding:7px;color:#9eeaff;background:#0a395b66;border:1px solid #43c7ef66}
+    @media(pointer:coarse),(hover:none){.panel{display:none}.settings{right:15px;bottom:15px;font-size:9px}.touch{display:block;position:absolute;inset:auto 0 22px;height:170px;pointer-events:none}.stick{position:absolute;bottom:0;width:132px;height:132px;border:1px solid #41cdf762;border-radius:50%;background:radial-gradient(circle,#13649859,#05183438 58%,transparent 60%);pointer-events:auto;touch-action:none}.move{left:20px}.look{right:20px}.knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border:1px solid #6cecffcc;border-radius:50%;background:#1379b266;box-shadow:0 0 18px #00c8ff47}.label{position:absolute;top:-18px;font-size:8px;letter-spacing:.2em;color:#b7ebf88c}.move .label{left:0}.look .label{right:0}.vertical{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:6px;pointer-events:auto}.vertical button{width:30px;height:30px;color:#a9efff;background:#052644aa;border:1px solid #41cdf766}}
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div class="hud">
+    <div class="top"><div class="brand">◉ NEON VOID <span>EXPLORER</span></div><div class="status"><i class="dot"></i> LIVE LINK · <span id="speed">8.0 U/S</span></div></div>
+    <div class="coords"><div class="eyebrow">POSITION / VECTOR</div><strong id="coords">X 0.0 · Y 0.0 · Z 6.0</strong></div><div class="cross"></div>
+    <div class="panel"><div class="eyebrow">NAVIGATION PROTOCOL</div><br>W A S D · MOVE<br>SPACE · ASCEND &nbsp; SHIFT · DESCEND<br>DRAG / RIGHT STICK · LOOK</div>
+    <button class="settings" id="open">⌘ COMMANDES</button>
+    <div class="touch"><div class="stick move" id="move"><div class="label">MOVE</div><div class="knob"></div></div><div class="stick look" id="look"><div class="label">LOOK</div><div class="knob"></div></div><div class="vertical"><button data-action="rise">↑</button><button data-action="fall">↓</button></div></div>
+    <section class="modal" id="modal"><div class="card"><button class="close" id="close">×</button><div class="eyebrow">INPUT MATRIX / CUSTOM</div><h2>Relier commandes &amp; actions</h2><p class="help">Cliquez sur une touche puis appuyez sur une touche du clavier. Les réglages sont sauvegardés dans ce navigateur.</p><div id="bindings"></div></div></section>
+  </div>
+  <script src="game.js" defer></script>
+</body>
+</html>
