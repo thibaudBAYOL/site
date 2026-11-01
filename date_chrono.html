@@ -8,6 +8,12 @@
         table, th, td {
         border: 1px solid;
         }
+        .weekend {
+            background-color: orange;
+        }
+        .end {
+            background-color: black;
+        }
     </style>
 </head>
 
@@ -18,6 +24,14 @@
     <input type = "button" onclick="setCookie()" value ="SET Cookie"></input>
     <input type = "button" onclick="getCookie()" value ="GET Cookie"></input>
     <input type = "button" onclick="add_crono()" value ="Nouveau"></input>
+    <input type = "button" onclick="import_data()" value ="Importer"></input>
+    <textarea id = 'import' hidden>
+
+    </textarea>
+    <input type = "button" onclick="export_data()" value ="Exporter"></input>
+    <textarea id = 'export' hidden>
+
+    </textarea>
 <table id="calendar">
 </table>
     <div  class="date_ref">
@@ -55,14 +69,27 @@
 
 function init_calendar(){
     html ="";
+    my_d = new Date();
+    var my_date;
     for (var m = 1; m <= 12; m++) {
         html = html + "<tr>";
     for (var d = 1; d <= 31; d++) {
-    html = html + "<td id='"+d+"/"+m+"'>"+d+"/"+m+"</td>";
+        my_date = new Date(my_d.getFullYear(),m-1,d,12,0);
+        my_class = "";
+        if([0,6].includes(my_date.getDay())){
+            my_class += "weekend ";
+        }
+        if(d != my_date.getDate()){
+            my_class += "end ";
+        }
+        my_test(my_date.toUTCString() + " getDate" + my_date.getDate());
+    html = html + "<td id='"+d+"/"+m+"' class = '" + my_class + "' title = '" + my_date.toUTCString() + "''>"+d+"/"+m+"</td>";
     }
         html = html + "</tr>";
     }
     document.getElementById("calendar").innerHTML = html;
+    box = document.getElementById(my_d.getDate()+"/"+(my_d.getMonth()+1));
+    box.style.backgroundColor = "red";
 }
     function add_crono(){
         my_test("add_crono");
@@ -276,6 +303,69 @@ init_calendar();
 
     function my_test(msg){
         if(test) console.log(msg);
+    }
+
+    function export_data(){
+        input = document.getElementById("export");
+        if (input.hidden){
+            // export
+            liste = [];
+            tab = document.getElementsByClassName("date_ref");
+            
+            for (var i = 0; i < tab.length; i++) {
+                if (tab[i].children.name.value != "") {
+                    // {'name': "test" , "date": date};
+                    liste.push({ 'name': tab[i].children.name.value, "date": tab[i].children.date.value/*,"time":tab[i].children.time.value*/});
+                }
+            }
+            //{"name": "TEST" , "date":date.getDate()}
+            json = { "list": liste };
+
+            input.value = JSON.stringify(json);
+            
+
+
+            input.hidden = false;
+        }else{
+            input.hidden = true;
+        }
+    }
+
+    function import_data(){
+        input = document.getElementById("import");
+        if (input.hidden){
+            input.hidden = false;
+        }else{
+            // importer
+            json = JSON.parse(input.value);
+                tab = document.getElementsByClassName("date_ref");
+                my_test(json);
+                my_test(json.list.length + " " + tab.length);
+                const tab_length_now = tab.length;
+                // crée div <div> <input type='text' name="name" /> <input type='date' name="date" /> <p name="crono"></p> </div> dans <body>
+                    for (var i = 0; i < json.list.length; i++) {
+                        add_crono();
+                    }
+                    tab = document.getElementsByClassName("date_ref");
+                
+                
+                for (var i = 0; i < json.list.length; i++) {
+                    tab_index = tab_length_now + i;
+                    my_test("l.337 :"+i+ " " + json.list[i].date);
+                    tab[tab_index].children.name.value = json.list[i].name;
+                    tab[tab_index].children.date.value = json.list[i].date;
+                    tab[tab_index].id= "date_ref_" + tab_index;
+                    if(json.list[i].name != "" && json.list[i].date != ""  && json.list[i].date != 'Invalid Date' ){
+                        d = new Date(json.list[i].date);
+                        box = document.getElementById(d.getDate()+"/"+(d.getMonth()+1));
+                        box.style.backgroundColor = "yellow"
+                        box.innerHTML = box.innerHTML + "<p><a href='#"+tab[tab_index].id+"' onClick='bleu(\""+tab[tab_index].id+"\");'><b>"+json.list[i].name+"<b></a></p>";
+                    }
+                }
+                
+
+            input.hidden = true;
+        }
     }
 
 </script>
