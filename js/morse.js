@@ -277,31 +277,66 @@ function updateStatsDisplay() {
     `;
     letterStatsDiv.innerHTML = letterHtml;
 }
+
+class AudioPlayer {
+    constructor() {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    async play(freq, duration = 100) {
+        // Certains navigateurs suspendent le contexte
+        if (this.ctx.state === "suspended") {
+            await this.ctx.resume();
+        }
+
+        return new Promise((resolve) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            const now = this.ctx.currentTime;
+            const volume = 0.2;
+            const attack = 0.01; // 10 ms
+            const release = 0.01; // 10 ms
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(volume, now + attack);
+
+            const stopTime = now + duration / 1000;
+
+            gain.gain.setValueAtTime(volume, stopTime - release);
+            gain.gain.linearRampToValueAtTime(0, stopTime);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(stopTime);
+
+            osc.onended = () => {
+                osc.disconnect();
+                gain.disconnect();
+                resolve();
+            };
+        });
+    }
+
+    async close() {
+        await this.ctx.close();
+    }
+}
+
+let play = new AudioPlayer();
+
+
 /**
  * freq (Hz)
  * duration (ms)
  */
 async function playFreq(freq, duration = 100) {
-  return new Promise((resolve, reject) => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = "sine";       // onde sinusoïdale (pure)
-    osc.frequency.value = freq;
-
-    gain.gain.value = 0.2;   // volume raisonnable
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-
-    // arrêt automatique
-    setTimeout(() => {
-        osc.stop();
-        ctx.close();
-        resolve();
-    }, duration);
-    });
+    return play.play(freq, duration);
 }
 
 //play Morse
